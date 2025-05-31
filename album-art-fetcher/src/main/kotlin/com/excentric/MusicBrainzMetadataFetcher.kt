@@ -1,28 +1,22 @@
 package com.excentric
 
-import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.SpringBootApplication
+import com.excentric.model.MusicBrainzResponse
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
-import java.io.BufferedReader
+import org.springframework.stereotype.Component
+import org.springframework.web.client.RestTemplate
 import java.io.IOException
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.stream.Collectors
-
-@SpringBootApplication
-open class MusicBrainzApplication
-
-fun main(args: Array<String>) {
-    SpringApplication.run(MusicBrainzApplication::class.java, *args)
-}
 
 @ShellComponent
-class MusicBrainzMetadataFetcher {
+@Component
+class MusicBrainzMetadataFetcher(private val restTemplate: RestTemplate) {
     private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
     private val MB_API_URL = "https://musicbrainz.org/ws/2/"
 
@@ -47,55 +41,37 @@ class MusicBrainzMetadataFetcher {
 
         println("Querying MusicBrainz API: $searchUrl")
 
-        val url = URL(searchUrl)
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-        connection.setRequestProperty("User-Agent", USER_AGENT)
-        connection.setRequestProperty("Accept", "application/json")
+        // Set up headers
+        val headers = HttpHeaders()
+        headers.set("User-Agent", USER_AGENT)
+        headers.accept = listOf(MediaType.APPLICATION_JSON)
 
-        // MusicBrainz API requires a delay between requests
-        // For this example, we're making just one request
+        // Make the request
+        val entity = HttpEntity<String>(headers)
+        val response = restTemplate.exchange(
+            searchUrl,
+            HttpMethod.GET,
+            entity,
+            MusicBrainzResponse::class.java
+        )
 
-        // Read the response
-        val responseCode = connection.responseCode
-        if (responseCode != 200) {
-            throw IOException("HTTP error code: $responseCode")
+        println("Received response from MusicBrainz API")
+
+        // Process the response
+        val musicBrainzResponse = response.body
+            ?: throw IOException("Empty response from MusicBrainz API")
+
+        if (musicBrainzResponse.releases.isEmpty()) {
+            throw IOException("No releases found in the response")
         }
 
-        BufferedReader(
-            InputStreamReader(connection.inputStream, StandardCharsets.UTF_8)
-        ).use { reader ->
-            val jsonResponse = reader.lines().collect(Collectors.joining())
-            println("Received response from MusicBrainz API")
+        val mbid = musicBrainzResponse.releases.first().id
 
-            // Simple JSON parsing to extract the first release MBID
-            // Find the first "id" field after a "releases" array
-            val releasesIndex = jsonResponse.indexOf("\"releases\"")
-            if (releasesIndex == -1) {
-                throw IOException("No releases found in the response")
-            }
-
-            val idIndex = jsonResponse.indexOf("\"id\":", releasesIndex)
-            if (idIndex == -1) {
-                throw IOException("No release ID found in the response")
-            }
-
-            // Extract the MBID (UUID) which is enclosed in quotes
-            val startQuote = jsonResponse.indexOf("\"", idIndex + 5)
-            val endQuote = jsonResponse.indexOf("\"", startQuote + 1)
-
-            if (startQuote == -1 || endQuote == -1) {
-                throw IOException("Could not parse release ID from the response")
-            }
-
-            val mbid = jsonResponse.substring(startQuote + 1, endQuote)
-
-            // Validate that we have a proper UUID format
-            if (mbid.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex())) {
-                return mbid
-            } else {
-                throw IOException("Invalid MBID format: $mbid")
-            }
+        // Validate that we have a proper UUID format
+        if (mbid.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex())) {
+            return mbid
+        } else {
+            throw IOException("Invalid MBID format: $mbid")
         }
     }
 }

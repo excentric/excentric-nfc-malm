@@ -1,17 +1,24 @@
 package com.excentric
 
+import com.excentric.model.CoverArtResponse
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
+import org.springframework.stereotype.Component
+import org.springframework.web.client.RestTemplate
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 @ShellComponent
-class MusicBrainzAlbumArtDownloader {
+@Component
+class MusicBrainzAlbumArtDownloader(private val restTemplate: RestTemplate) {
     private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
     private val CAA_API_URL = "https://coverartarchive.org/"
 
@@ -27,17 +34,50 @@ class MusicBrainzAlbumArtDownloader {
     fun downloadAlbumArt(mbid: String, outputPath: String) {
         try {
             // Construct the URL for the front cover image
-            val url = URL(CAA_API_URL + "release/" + mbid + "/front")
+            val url = CAA_API_URL + "release/" + mbid
 
-            val connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-            connection.setRequestProperty("User-Agent", USER_AGENT)
+            // Set up headers
+            val headers = HttpHeaders()
+            headers.set("User-Agent", USER_AGENT)
+            headers.accept = listOf(MediaType.APPLICATION_JSON)
 
-            // Follow redirects (Cover Art Archive often redirects to the actual image)
-            connection.instanceFollowRedirects = true
+            // First, get the cover art metadata
+            val entity = HttpEntity<String>(headers)
+            val response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                CoverArtResponse::class.java
+            )
 
-            connection.inputStream.use { `in` ->
-                Files.copy(`in`, Path.of(outputPath), StandardCopyOption.REPLACE_EXISTING)
+            val coverArtResponse = response.body
+                ?: throw IOException("Empty response from Cover Art Archive API")
+
+            // Find the front cover image
+            val frontCover = coverArtResponse.images.find { it.front }
+                ?: throw IOException("No front cover found for release $mbid")
+
+            // Get the image URL (prefer large size if available)
+            val imageUrl = frontCover.thumbnails?.large ?: frontCover.image
+
+            // Now download the actual image
+            val imageHeaders = HttpHeaders()
+            imageHeaders.set("User-Agent", USER_AGENT)
+            val imageEntity = HttpEntity<String>(imageHeaders)
+
+            val imageResponse = restTemplate.exchange(
+                imageUrl,
+                HttpMethod.GET,
+                imageEntity,
+                Resource::class.java
+            )
+
+            val imageResource = imageResponse.body
+                ?: throw IOException("Failed to download image from $imageUrl")
+
+            // Save the image to the output path
+            imageResource.inputStream.use { inputStream ->
+                Files.copy(inputStream, Path.of(outputPath), StandardCopyOption.REPLACE_EXISTING)
                 println("Album art downloaded successfully to: $outputPath")
             }
         } catch (e: IOException) {
