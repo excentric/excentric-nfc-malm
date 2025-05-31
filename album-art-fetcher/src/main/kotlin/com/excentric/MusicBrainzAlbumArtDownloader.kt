@@ -1,6 +1,6 @@
 package com.excentric
 
-import com.excentric.model.CoverArtResponse
+import com.excentric.model.CoverArtResponseModel
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -47,7 +47,7 @@ class MusicBrainzAlbumArtDownloader(private val restTemplate: RestTemplate) {
                 url,
                 HttpMethod.GET,
                 entity,
-                CoverArtResponse::class.java
+                CoverArtResponseModel::class.java
             )
 
             val coverArtResponse = response.body

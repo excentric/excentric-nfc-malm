@@ -3,28 +3,24 @@ package com.excentric.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Model classes for Cover Art Archive API responses
- */
-
 @Serializable
-data class CoverArtResponse(
-    val images: List<CoverArtImage> = emptyList(),
+data class CoverArtResponseModel(
+    val images: List<CoverArtImageModel> = emptyList(),
     val release: String? = null
 )
 
 @Serializable
-data class CoverArtImage(
+data class CoverArtImageModel(
     val id: String,
     val front: Boolean = false,
     val back: Boolean = false,
     val approved: Boolean = false,
     val image: String, // URL to the full-size image
-    val thumbnails: Thumbnails? = null
+    val thumbnails: ThumbnailsModel? = null
 )
 
 @Serializable
-data class Thumbnails(
+data class ThumbnailsModel(
     val small: String? = null,
     val large: String? = null,
     @SerialName("250")
