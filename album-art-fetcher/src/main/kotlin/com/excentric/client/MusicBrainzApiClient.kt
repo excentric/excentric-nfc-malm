@@ -2,6 +2,7 @@ package com.excentric.client
 
 import com.excentric.model.MusicBrainzResponseModel
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -14,32 +15,29 @@ import java.nio.charset.StandardCharsets.UTF_8
 
 @Component
 class MusicBrainzApiClient(
-    private val restTemplate: RestTemplate
+    private val restTemplate: RestTemplate,
+    @Value("\${musicbrainz.api.user-agent}") private val userAgent: String,
+    @Value("\${musicbrainz.api.url}") private val mbApiUrl: String
 ) {
     private val logger = LoggerFactory.getLogger(MusicBrainzApiClient::class.java)
 
-    companion object {
-        private const val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
-        private const val MB_API_URL = "https://musicbrainz.org/ws/2/"
-    }
-
     fun searchAlbums(artist: String, album: String): MusicBrainzResponseModel {
         // Encode the album name for URL
-        val encodedAlbum = URLEncoder.encode(album, UTF_8.toString())
+        val encodedAlbum = URLEncoder.encode(album, UTF_8)
 
         // Construct the search URL based on whether artist is provided
         val searchUrl = if (artist.isEmpty()) {
-            "${MB_API_URL}release?query=release:$encodedAlbum&fmt=json"
+            "${mbApiUrl}release?query=release:$encodedAlbum&fmt=json"
         } else {
             // Encode the artist name for URL
-            val encodedArtist = URLEncoder.encode(artist, UTF_8.toString())
-            "${MB_API_URL}release?query=artist:$encodedArtist%20AND%20release:$encodedAlbum&fmt=json"
+            val encodedArtist = URLEncoder.encode(artist, UTF_8)
+            "${mbApiUrl}release?query=artist:$encodedArtist%20AND%20release:$encodedAlbum&fmt=json"
         }
 
         logger.info("Querying MusicBrainz API: $searchUrl")
 
         val headers = HttpHeaders().apply {
-            set("User-Agent", USER_AGENT)
+            set("User-Agent", userAgent)
             accept = listOf(APPLICATION_JSON)
         }
 
