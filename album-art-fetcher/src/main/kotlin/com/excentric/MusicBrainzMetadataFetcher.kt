@@ -1,6 +1,7 @@
 package com.excentric
 
 import com.excentric.client.MusicBrainzApiClient
+import com.excentric.util.ConsoleColors.greenOrRed
 import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
@@ -18,10 +19,10 @@ class MusicBrainzMetadataFetcher(
     fun findMbid(
         @ShellOption(help = "Album name") album: String,
         @ShellOption(help = "Artist name", defaultValue = "") artist: String,
-    ): String {
+    ) {
         logger.info("Searching for album: $album by artist: $artist")
 
-        return findMbidByAlbumInfo(artist, album)
+        findMbidByAlbumInfo(artist, album)
     }
 
     fun findMbidByAlbumInfo(artist: String, album: String): String {
@@ -33,10 +34,10 @@ class MusicBrainzMetadataFetcher(
         val artistName = firstResult.getFirstArtistName()
         val albumYear = albumResults.findEarliestReleaseYear(artistName, albumName)
 
-        logger.info("ID: $mbid")
-        logger.info("Album: $albumName")
-        logger.info("Artist: $artistName")
-        logger.info("Year: $albumYear")
+        logger.info("ID: ${greenOrRed(mbid)}")
+        logger.info("Album: ${greenOrRed(albumName)}")
+        logger.info("Artist: ${greenOrRed(artistName)}")
+        logger.info("Year: ${greenOrRed(albumYear)}")
 
         return mbid
     }

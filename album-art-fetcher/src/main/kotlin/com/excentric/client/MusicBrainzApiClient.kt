@@ -17,6 +17,7 @@ class MusicBrainzApiClient(
     private val restTemplate: RestTemplate
 ) {
     private val logger = LoggerFactory.getLogger(MusicBrainzApiClient::class.java)
+
     companion object {
         private const val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
         private const val MB_API_URL = "https://musicbrainz.org/ws/2/"
@@ -51,11 +52,8 @@ class MusicBrainzApiClient(
             MusicBrainzResponseModel::class.java
         )
 
-        logger.info("Received response from MusicBrainz API")
-
         // Process the response
-        val musicBrainzResponse = response.body
-            ?: throw IOException("Empty response from MusicBrainz API")
+        val musicBrainzResponse = response.body ?: throw IOException("Empty response from MusicBrainz API")
 
         if (musicBrainzResponse.releases.isEmpty()) {
             throw IOException("No releases found in the response")
