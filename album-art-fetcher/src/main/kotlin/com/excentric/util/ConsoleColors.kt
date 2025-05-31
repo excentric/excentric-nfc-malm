@@ -7,7 +7,7 @@ object ConsoleColors {
 
     fun greenOrRed(text: Any?): String {
         if (text == null || text.toString().isEmpty()) {
-            return "${RED}Not Found$RESET"
+            return "${RED}Unknown$RESET"
         }
         return "$GREEN$text$RESET"
     }

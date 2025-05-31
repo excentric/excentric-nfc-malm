@@ -22,8 +22,8 @@ class MetadataStorageTest {
     @BeforeEach
     fun setUp() {
         testDirectoryPath = "album-metadata-test"
-        metadataStorage = MetadataStorage(testDirectoryPath)
         objectMapper = jacksonObjectMapper()
+        metadataStorage = MetadataStorage(testDirectoryPath, objectMapper)
 
         // Create a temporary directory for testing
         testDirectory = File(testDirectoryPath)
@@ -94,5 +94,42 @@ class MetadataStorageTest {
         assertEquals("Test Album", savedMetadata.album)
         assertEquals("Test Artist", savedMetadata.artist)
         assertEquals(2023, savedMetadata.year)
+    }
+
+    @Test
+    fun `listSlots should return all saved album metadata`() {
+        // Given
+        // Save first album
+        metadataStorage.saveToSlot(1)
+
+        // Save second album with different metadata
+        val secondAlbum = AlbumMetadata(
+            mbid = "second-mbid",
+            album = "Second Album",
+            artist = "Second Artist",
+            year = 2022
+        )
+        metadataStorage.albumMetadata = secondAlbum
+        metadataStorage.saveToSlot(2)
+
+        // When
+        val result = metadataStorage.listSlots()
+
+        // Then
+        assertEquals(2, result.size)
+
+        // Verify first album
+        val firstAlbum = result.find { it.mbid == "test-mbid" }
+        assertNotNull(firstAlbum)
+        assertEquals("Test Album", firstAlbum?.album)
+        assertEquals("Test Artist", firstAlbum?.artist)
+        assertEquals(2023, firstAlbum?.year)
+
+        // Verify second album
+        val foundSecondAlbum = result.find { it.mbid == "second-mbid" }
+        assertNotNull(foundSecondAlbum)
+        assertEquals("Second Album", foundSecondAlbum?.album)
+        assertEquals("Second Artist", foundSecondAlbum?.artist)
+        assertEquals(2022, foundSecondAlbum?.year)
     }
 }

@@ -1,6 +1,8 @@
 package com.excentric.storage
 
+import com.excentric.errors.MusicBrainzException
 import com.excentric.model.local.AlbumMetadata
+import com.excentric.util.ConsoleColors.greenOrRed
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -24,32 +26,54 @@ class MetadataStorage(
 
     var albumMetadata: AlbumMetadata? = null
 
-    fun saveToSlot(slot: Int): Boolean {
+    fun saveToSlot(slot: Int) {
         val metadata = albumMetadata
 
-        if (slot < 1 || slot > 10) {
-            logger.error("Invalid slot number: $slot. Must be between 1 and 10.")
-            return false
-        }
-
-        if (metadata == null) {
-            logger.error("No album metadata available to save")
-            return false
-        }
-
-        if (!metadataDir.exists()) {
-            logger.error("Metadata directory does not exist: $metadataDirPath")
-            return false
-        }
+        validate(slot, metadata)
 
         val metadataFile = File(metadataDirPath, "$slot.json")
         return try {
             objectMapper.writeValue(metadataFile, metadata)
             logger.info("Successfully saved album metadata to slot $slot")
-            true
         } catch (e: Exception) {
-            logger.error("Failed to save album metadata to slot $slot: ${e.message}")
-            false
+            throw MusicBrainzException("Failed to save album metadata to slot $slot: ${e.message}")
+        }
+    }
+
+    fun listSlots(): List<AlbumMetadata> {
+        validateMetadataDir()
+
+        return getMetadataFiles().mapNotNull { metadataFile ->
+            try {
+                val metadata = objectMapper.readValue(metadataFile, AlbumMetadata::class.java)
+                logger.info("Slot ${metadataFile.nameWithoutExtension}: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}")
+                metadata
+            } catch (e: Exception) {
+                logger.error("Failed to read album metadata from file ${metadataFile.name}: ${e.message}")
+                null
+            }
+        }
+    }
+
+    private fun getMetadataFiles() = metadataDir.listFiles { file ->
+        file.isFile && file.name.matches(Regex("\\d+\\.json"))
+    }.orEmpty()
+
+    private fun validate(slot: Int, metadata: AlbumMetadata?) {
+        if (slot < 1 || slot > 10) {
+            throw MusicBrainzException("Invalid slot number: $slot. Must be between 1 and 10.")
+        }
+
+        if (metadata == null) {
+            throw MusicBrainzException("No album metadata available to save")
+        }
+
+        validateMetadataDir()
+    }
+
+    private fun validateMetadataDir() {
+        if (!metadataDir.exists() || !metadataDir.isDirectory) {
+            throw MusicBrainzException("Metadata directory does not exist: $metadataDirPath")
         }
     }
 }

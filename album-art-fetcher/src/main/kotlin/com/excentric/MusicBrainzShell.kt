@@ -1,5 +1,6 @@
 package com.excentric
 
+import com.excentric.errors.MusicBrainzException
 import com.excentric.service.MusicBrainzService
 import com.excentric.storage.MetadataStorage
 import org.slf4j.LoggerFactory
@@ -37,6 +38,19 @@ class MusicBrainzShell(
         @ShellOption(help = "Slot number (1-10)") slot: Int
     ) {
         logger.info("Saving album metadata to slot: $slot")
-        metadataStorage.saveToSlot(slot)
+        doSafely { metadataStorage.saveToSlot(slot) }
+    }
+
+    @ShellMethod(key = ["list-slots", "ls"], value = "List all saved album metadata slots")
+    fun listSlots() {
+        doSafely { metadataStorage.listSlots() }
+    }
+
+    private fun doSafely(command: () -> Unit) {
+        try {
+            command()
+        } catch (e: MusicBrainzException) {
+            logger.error(e.message)
+        }
     }
 }
