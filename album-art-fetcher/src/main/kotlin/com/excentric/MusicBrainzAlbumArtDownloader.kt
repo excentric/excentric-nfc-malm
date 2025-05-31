@@ -1,5 +1,6 @@
 package com.excentric
 
+import com.excentric.errors.MusicBrainzException
 import com.excentric.model.CoverArtResponseModel
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.Resource
@@ -53,11 +54,11 @@ class MusicBrainzAlbumArtDownloader(private val restTemplate: RestTemplate) {
             )
 
             val coverArtResponse = response.body
-                ?: throw IOException("Empty response from Cover Art Archive API")
+                ?: throw MusicBrainzException("Empty response from Cover Art Archive API")
 
             // Find the front cover image
             val frontCover = coverArtResponse.images.find { it.front }
-                ?: throw IOException("No front cover found for release $mbid")
+                ?: throw MusicBrainzException("No front cover found for release $mbid")
 
             // Get the image URL (prefer large size if available)
             val imageUrl = frontCover.thumbnails?.large ?: frontCover.image
@@ -75,7 +76,7 @@ class MusicBrainzAlbumArtDownloader(private val restTemplate: RestTemplate) {
             )
 
             val imageResource = imageResponse.body
-                ?: throw IOException("Failed to download image from $imageUrl")
+                ?: throw MusicBrainzException("Failed to download image from $imageUrl")
 
             // Save the image to the output path
             imageResource.inputStream.use { inputStream ->
