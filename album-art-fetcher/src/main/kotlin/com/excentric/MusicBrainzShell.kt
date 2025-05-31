@@ -22,7 +22,7 @@ class MusicBrainzShell(
         exitProcess(0)
     }
 
-    @ShellMethod(key = ["f"], value = "Find MusicBrainz Metadata for an album")
+    @ShellMethod(key = ["find-metadata", "f"], value = "Find MusicBrainz Metadata for an album")
     fun findMusicBrainzAlbum(
         @ShellOption(help = "Album name") album: String,
         @ShellOption(help = "Artist name", defaultValue = "") artist: String,
@@ -30,5 +30,22 @@ class MusicBrainzShell(
         logger.info("Searching for album: $album by artist: $artist")
         val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
         metadataStorage.albumMetadata = albumMetadata
+    }
+
+    @ShellMethod(key = ["save-to-slot"], value = "Save current album metadata to a numbered slot (1-10)")
+    fun saveToSlot(
+        @ShellOption(help = "Slot number (1-10)") slot: Int
+    ): String {
+        logger.info("Saving album metadata to slot: $slot")
+
+        if (slot < 1 || slot > 10) {
+            return "Error: Slot number must be between 1 and 10"
+        }
+
+        return if (metadataStorage.saveToSlot(slot)) {
+            "Successfully saved album metadata to slot $slot"
+        } else {
+            "Failed to save album metadata. Make sure you have searched for an album first."
+        }
     }
 }
