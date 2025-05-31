@@ -12,6 +12,11 @@ dependencies {
     implementation(libs.springShell)
     implementation(libs.kotlinxSerialization)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    // Testing dependencies
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
 
 application {
