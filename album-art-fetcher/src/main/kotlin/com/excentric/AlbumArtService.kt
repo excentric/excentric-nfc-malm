@@ -11,7 +11,7 @@ class AlbumArtService(
     private val artDownloader: MusicBrainzAlbumArtDownloader
 ) {
     fun findAndDownloadAlbumArt(artist: String, album: String, outputPath: String): String {
-        val mbid = metadataFetcher.findMbidByAlbumInfo(artist, album)
+        val mbid = metadataFetcher.searchMusicBrainz(artist, album)
         artDownloader.downloadAlbumArt(mbid, outputPath)
         return "Album art for '$album' by '$artist' downloaded to $outputPath"
     }

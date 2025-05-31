@@ -1,7 +1,7 @@
 package com.excentric
 
 import com.excentric.errors.MusicBrainzException
-import com.excentric.model.CoverArtResponseModel
+import com.excentric.model.api.CoverArtResponseModel
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity

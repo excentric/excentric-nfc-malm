@@ -1,7 +1,7 @@
 package com.excentric.client
 
 import com.excentric.errors.MusicBrainzException
-import com.excentric.model.MusicBrainzResponseModel
+import com.excentric.model.api.MusicBrainzResponseModel
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity

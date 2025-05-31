@@ -35,7 +35,6 @@ open class MusicBrainzApplication {
 
 @ShellComponent
 class ApplicationCommands {
-
     @ShellMethod(key = ["q"], value = "Exit the application immediately")
     fun quit() {
         exitProcess(0)
