@@ -1,6 +1,7 @@
 package com.excentric
 
 import com.excentric.service.MusicBrainzService
+import com.excentric.storage.MetadataStorage
 import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
@@ -11,7 +12,8 @@ import kotlin.system.exitProcess
 @ShellComponent
 @Component
 class MusicBrainzShell(
-    private val musicBrainzService: MusicBrainzService
+    private val musicBrainzService: MusicBrainzService,
+    private val metadataStorage: MetadataStorage
 ) {
     private val logger = LoggerFactory.getLogger(MusicBrainzShell::class.java)
 
@@ -26,6 +28,7 @@ class MusicBrainzShell(
         @ShellOption(help = "Artist name", defaultValue = "") artist: String,
     ) {
         logger.info("Searching for album: $album by artist: $artist")
-        musicBrainzService.searchMusicBrainz(artist, album)
+        val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
+        metadataStorage.albumMetadata = albumMetadata
     }
 }

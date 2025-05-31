@@ -12,7 +12,7 @@ class MusicBrainzService(
 ) {
     private val logger = LoggerFactory.getLogger(MusicBrainzService::class.java)
 
-    fun searchMusicBrainz(artistQuery: String, albumQuery: String): AlbumMetadata? {
+    fun searchMusicBrainz(artistQuery: String, albumQuery: String): AlbumMetadata {
         val albumResults = musicBrainzApiClient.searchAlbums(artistQuery, albumQuery)
         val firstResult = albumResults.releases.first()
 
