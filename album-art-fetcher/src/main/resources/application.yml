@@ -2,10 +2,9 @@ spring:
   main:
     web-application-type: none
 
-musicbrainz:
-  api:
-    url: https://musicbrainz.org/ws/2/
-    user-agent: MyMusicApp/1.0 (nfc-sonos@excentric.com)
-
-application:
+music-album-label-maker:
+  musicbrainz:
+    api:
+      url: https://musicbrainz.org/ws/2/
+      user-agent: MusicAlbumLabelMaker/0.0.1 (nfc-sonos@excentric.com)
   metadata-directory: ${user.home}/.album-metadata

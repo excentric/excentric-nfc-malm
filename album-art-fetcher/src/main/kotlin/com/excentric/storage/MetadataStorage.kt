@@ -11,7 +11,7 @@ import java.io.File
 
 @Component
 class MetadataStorage(
-    @Value("\${application.metadata-directory}")
+    @Value("\${music-album-label-maker.metadata-directory}")
     private val metadataDirPath: String,
     private val objectMapper: ObjectMapper
 ) {

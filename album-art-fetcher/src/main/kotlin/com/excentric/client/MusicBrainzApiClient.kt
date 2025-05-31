@@ -2,7 +2,6 @@ package com.excentric.client
 
 import com.excentric.errors.MusicBrainzException
 import com.excentric.model.api.MusicBrainzResponseModel
-import org.apache.catalina.util.URLEncoder
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
@@ -16,8 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder
 @Component
 class MusicBrainzApiClient(
     private val restTemplate: RestTemplate,
-    @Value("\${musicbrainz.api.user-agent}") private val userAgent: String,
-    @Value("\${musicbrainz.api.url}") private val mbApiUrl: String
+    @Value("\${music-album-label-maker.musicbrainz.api.user-agent}") private val userAgent: String,
+    @Value("\${music-album-label-maker.musicbrainz.api.url}") private val mbApiUrl: String
 ) {
     private val logger = LoggerFactory.getLogger(MusicBrainzApiClient::class.java)
 
