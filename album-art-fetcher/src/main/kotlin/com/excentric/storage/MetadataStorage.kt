@@ -2,49 +2,53 @@ package com.excentric.storage
 
 import com.excentric.model.local.AlbumMetadata
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 
 @Component
-class MetadataStorage {
+class MetadataStorage(
+    @Value("\${application.metadata-directory}")
+    private val metadataDirPath: String,
+    private val objectMapper: ObjectMapper
+) {
     private val logger = LoggerFactory.getLogger(MetadataStorage::class.java)
-    private val objectMapper: ObjectMapper = jacksonObjectMapper()
+
+    private var metadataDir: File = File(metadataDirPath).also {
+        if (!it.exists())
+            if (!it.mkdirs()) {
+                logger.error("Failed to create metadata directory: $metadataDirPath")
+            }
+    }
 
     var albumMetadata: AlbumMetadata? = null
 
-    /**
-     * Saves the current albumMetadata to a JSON file in the specified slot
-     * @param slot An integer between 1 and 10 representing the storage slot
-     * @return true if save was successful, false otherwise
-     */
     fun saveToSlot(slot: Int): Boolean {
+        val metadata = albumMetadata
+
         if (slot < 1 || slot > 10) {
             logger.error("Invalid slot number: $slot. Must be between 1 and 10.")
             return false
         }
 
-        val metadata = albumMetadata
         if (metadata == null) {
             logger.error("No album metadata available to save")
             return false
         }
 
-        val directory = File("album-metadata")
-        if (!directory.exists()) {
-            directory.mkdirs()
+        if (!metadataDir.exists()) {
+            logger.error("Metadata directory does not exist: $metadataDirPath")
+            return false
         }
 
-        val file = File(directory, "$slot.json")
+        val metadataFile = File(metadataDirPath, "$slot.json")
         return try {
-            objectMapper.writeValue(file, metadata)
+            objectMapper.writeValue(metadataFile, metadata)
             logger.info("Successfully saved album metadata to slot $slot")
             true
         } catch (e: Exception) {
-            logger.error("Failed to save album metadata to slot $slot", e)
+            logger.error("Failed to save album metadata to slot $slot: ${e.message}")
             false
         }
     }

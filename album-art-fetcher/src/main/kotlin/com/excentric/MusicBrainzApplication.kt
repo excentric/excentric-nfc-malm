@@ -1,5 +1,7 @@
 package com.excentric
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -26,5 +28,10 @@ open class MusicBrainzApplication {
             .build().apply {
                 messageConverters.add(0, MappingJackson2HttpMessageConverter())
             }
+    }
+
+    @Bean
+    open fun objectMapper(): ObjectMapper {
+        return jacksonObjectMapper()
     }
 }

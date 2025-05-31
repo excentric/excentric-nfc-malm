@@ -6,3 +6,6 @@ musicbrainz:
   api:
     url: https://musicbrainz.org/ws/2/
     user-agent: MyMusicApp/1.0 (nfc-sonos@excentric.com)
+
+application:
+  metadata-directory: ${user.home}/.album-metadata

@@ -17,18 +17,20 @@ class MetadataStorageTest {
     private lateinit var metadataStorage: MetadataStorage
     private lateinit var objectMapper: ObjectMapper
     private lateinit var testDirectory: File
-    
+    private lateinit var testDirectoryPath: String
+
     @BeforeEach
     fun setUp() {
-        metadataStorage = MetadataStorage()
+        testDirectoryPath = "album-metadata-test"
+        metadataStorage = MetadataStorage(testDirectoryPath)
         objectMapper = jacksonObjectMapper()
-        
+
         // Create a temporary directory for testing
-        testDirectory = File("album-metadata-test")
+        testDirectory = File(testDirectoryPath)
         if (!testDirectory.exists()) {
             testDirectory.mkdirs()
         }
-        
+
         // Set up a test album metadata
         metadataStorage.albumMetadata = AlbumMetadata(
             mbid = "test-mbid",
@@ -37,61 +39,55 @@ class MetadataStorageTest {
             year = 2023
         )
     }
-    
+
     @AfterEach
     fun tearDown() {
         // Clean up test directory
         testDirectory.deleteRecursively()
-        
-        // Delete the actual directory created during tests
-        val actualDirectory = File("album-metadata")
-        if (actualDirectory.exists()) {
-            actualDirectory.deleteRecursively()
-        }
     }
-    
+
     @Test
     fun `saveToSlot should return false when slot is less than 1`() {
         // When
         val result = metadataStorage.saveToSlot(0)
-        
+
         // Then
         assertFalse(result)
     }
-    
+
     @Test
     fun `saveToSlot should return false when slot is greater than 10`() {
         // When
         val result = metadataStorage.saveToSlot(11)
-        
+
         // Then
         assertFalse(result)
     }
-    
+
     @Test
     fun `saveToSlot should return false when albumMetadata is null`() {
         // Given
         metadataStorage.albumMetadata = null
-        
+
         // When
         val result = metadataStorage.saveToSlot(1)
-        
+
         // Then
         assertFalse(result)
     }
-    
+
     @Test
     fun `saveToSlot should save albumMetadata to correct file`() {
         // When
         val result = metadataStorage.saveToSlot(5)
-        
+
         // Then
         assertTrue(result)
-        
+
         // Verify file was created
-        val savedFile = File("album-metadata/5.json")
+        val savedFile = File(testDirectoryPath, "5.json")
         assertTrue(savedFile.exists())
-        
+
         // Verify file content
         val savedMetadata: AlbumMetadata = objectMapper.readValue(savedFile)
         assertEquals("test-mbid", savedMetadata.mbid)
