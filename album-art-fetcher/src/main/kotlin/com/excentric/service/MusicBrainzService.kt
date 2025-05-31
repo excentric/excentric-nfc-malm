@@ -1,7 +1,7 @@
 package com.excentric.service
 
 import com.excentric.client.MusicBrainzApiClient
-import com.excentric.model.local.AlbumMetadata
+import com.excentric.model.storage.AlbumMetadata
 import com.excentric.util.ConsoleColors.greenOrRed
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

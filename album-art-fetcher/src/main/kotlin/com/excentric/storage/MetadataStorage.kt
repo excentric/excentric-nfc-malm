@@ -1,7 +1,7 @@
 package com.excentric.storage
 
 import com.excentric.errors.MusicBrainzException
-import com.excentric.model.local.AlbumMetadata
+import com.excentric.model.storage.AlbumMetadata
 import com.excentric.util.ConsoleColors.greenOrRed
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory

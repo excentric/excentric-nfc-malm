@@ -1,4 +1,4 @@
-package com.excentric.model.local
+package com.excentric.model.storage
 
 data class AlbumMetadata(
     val mbid: String,

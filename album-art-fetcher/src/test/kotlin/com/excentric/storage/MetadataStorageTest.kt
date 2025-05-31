@@ -1,6 +1,6 @@
 package com.excentric.storage
 
-import com.excentric.model.local.AlbumMetadata
+import com.excentric.model.storage.AlbumMetadata
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -8,9 +8,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.nio.file.Path
 
 class MetadataStorageTest {
 
