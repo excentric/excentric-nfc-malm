@@ -8,7 +8,11 @@ data class MusicBrainzResponseModel(
     val releases: List<AlbumReleaseModel> = emptyList()
 ) {
     fun findEarliestReleaseYear(artistName: String?, albumName: String): Int? {
-        return releases.filter { it.title == albumName && it.artistCredit.firstOrNull()?.name == artistName && it.getYear() != null }.sortedBy { it.getYear() }.first().getYear()
+        val sortedReleases = releases.filter { it.title == albumName && it.artistCredit.firstOrNull()?.name == artistName && it.getYear() != null }.sortedBy { it.getYear() }
+        if (sortedReleases.isEmpty()) {
+            return null
+        }
+        return sortedReleases.first().getYear()
     }
 }
 

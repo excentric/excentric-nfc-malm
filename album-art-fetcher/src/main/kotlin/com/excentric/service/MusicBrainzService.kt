@@ -26,9 +26,6 @@ class MusicBrainzService(
         logger.info("Artist: ${greenOrRed(artist)}")
         logger.info("Year: ${greenOrRed(year)}")
 
-        if (!artist.isNullOrBlank() && year != null)
-            return AlbumMetadata(mbid, album, artist, year)
-
-        return null
+        return AlbumMetadata(mbid, album, artist, year)
     }
 }
