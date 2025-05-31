@@ -1,6 +1,7 @@
 package com.excentric
 
 import com.excentric.model.CoverArtResponseModel
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -19,6 +20,7 @@ import java.nio.file.StandardCopyOption
 @ShellComponent
 @Component
 class MusicBrainzAlbumArtDownloader(private val restTemplate: RestTemplate) {
+    private val logger = LoggerFactory.getLogger(MusicBrainzAlbumArtDownloader::class.java)
     private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
     private val CAA_API_URL = "https://coverartarchive.org/"
 
@@ -78,10 +80,10 @@ class MusicBrainzAlbumArtDownloader(private val restTemplate: RestTemplate) {
             // Save the image to the output path
             imageResource.inputStream.use { inputStream ->
                 Files.copy(inputStream, Path.of(outputPath), StandardCopyOption.REPLACE_EXISTING)
-                println("Album art downloaded successfully to: $outputPath")
+                logger.info("Album art downloaded successfully to: $outputPath")
             }
         } catch (e: IOException) {
-            System.err.println("Failed to download album art: " + e.message)
+            logger.error("Failed to download album art: {}", e.message)
             throw e
         }
     }

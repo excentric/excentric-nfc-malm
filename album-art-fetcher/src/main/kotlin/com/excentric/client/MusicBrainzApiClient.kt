@@ -1,6 +1,7 @@
 package com.excentric.client
 
 import com.excentric.model.MusicBrainzResponseModel
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 class MusicBrainzApiClient(
     private val restTemplate: RestTemplate
 ) {
+    private val logger = LoggerFactory.getLogger(MusicBrainzApiClient::class.java)
     companion object {
         private const val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
         private const val MB_API_URL = "https://musicbrainz.org/ws/2/"
@@ -28,7 +30,7 @@ class MusicBrainzApiClient(
         // Construct the search URL
         val searchUrl = "${MB_API_URL}release?query=artist:$encodedArtist%20AND%20release:$encodedAlbum&fmt=json"
 
-        println("Querying MusicBrainz API: $searchUrl")
+        logger.info("Querying MusicBrainz API: $searchUrl")
 
         val headers = HttpHeaders().apply {
             set("User-Agent", USER_AGENT)
@@ -44,7 +46,7 @@ class MusicBrainzApiClient(
             MusicBrainzResponseModel::class.java
         )
 
-        println("Received response from MusicBrainz API")
+        logger.info("Received response from MusicBrainz API")
 
         // Process the response
         val musicBrainzResponse = response.body

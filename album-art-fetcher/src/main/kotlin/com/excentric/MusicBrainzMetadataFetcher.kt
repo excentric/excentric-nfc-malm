@@ -1,6 +1,7 @@
 package com.excentric
 
 import com.excentric.client.MusicBrainzApiClient
+import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
@@ -12,14 +13,15 @@ import java.io.IOException
 class MusicBrainzMetadataFetcher(
     private val musicBrainzApiClient: MusicBrainzApiClient
 ) {
+    private val logger = LoggerFactory.getLogger(MusicBrainzMetadataFetcher::class.java)
     @ShellMethod(key = ["find-mbid"], value = "Find MusicBrainz ID for an album")
     fun findMbid(
         @ShellOption(help = "Artist name") artist: String,
         @ShellOption(help = "Album name") album: String
     ): String {
-        println("Searching for album: $album by artist: $artist")
+        logger.info("Searching for album: $album by artist: $artist")
         val mbid = findMbidByAlbumInfo(artist, album)
-        println("Found MBID: $mbid")
+        logger.info("Found MBID: $mbid")
         return mbid
     }
 
