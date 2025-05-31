@@ -1,6 +1,6 @@
 package com.excentric.model
 
-import kotlinx.serialization.SerialName
+import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +13,7 @@ data class AlbumReleaseModel(
     val id: String,
     val title: String,
     val status: String? = null,
-    @SerialName("artist-credit")
+    @JsonProperty("artist-credit")
     val artistCredit: List<ArtistCreditModel> = emptyList(),
     val date: String? = null
 )

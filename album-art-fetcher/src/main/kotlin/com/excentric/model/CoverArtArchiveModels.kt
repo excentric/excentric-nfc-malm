@@ -1,6 +1,6 @@
 package com.excentric.model
 
-import kotlinx.serialization.SerialName
+import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,10 +23,10 @@ data class CoverArtImageModel(
 data class ThumbnailsModel(
     val small: String? = null,
     val large: String? = null,
-    @SerialName("250")
+    @JsonProperty("250")
     val size250: String? = null,
-    @SerialName("500")
+    @JsonProperty("500")
     val size500: String? = null,
-    @SerialName("1200")
+    @JsonProperty("1200")
     val size1200: String? = null
 )

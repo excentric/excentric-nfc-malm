@@ -23,12 +23,17 @@ class MusicBrainzApiClient(
     }
 
     fun searchAlbums(artist: String, album: String): MusicBrainzResponseModel {
-        // Encode the artist and album names for URL
-        val encodedArtist = URLEncoder.encode(artist, UTF_8.toString())
+        // Encode the album name for URL
         val encodedAlbum = URLEncoder.encode(album, UTF_8.toString())
 
-        // Construct the search URL
-        val searchUrl = "${MB_API_URL}release?query=artist:$encodedArtist%20AND%20release:$encodedAlbum&fmt=json"
+        // Construct the search URL based on whether artist is provided
+        val searchUrl = if (artist.isEmpty()) {
+            "${MB_API_URL}release?query=release:$encodedAlbum&fmt=json"
+        } else {
+            // Encode the artist name for URL
+            val encodedArtist = URLEncoder.encode(artist, UTF_8.toString())
+            "${MB_API_URL}release?query=artist:$encodedArtist%20AND%20release:$encodedAlbum&fmt=json"
+        }
 
         logger.info("Querying MusicBrainz API: $searchUrl")
 
