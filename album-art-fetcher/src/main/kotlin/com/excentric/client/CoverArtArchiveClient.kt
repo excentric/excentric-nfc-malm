@@ -1,4 +1,4 @@
-package com.excentric.service
+package com.excentric.client
 
 import com.excentric.errors.MusicBrainzException
 import com.excentric.model.api.CoverArtResponseModel
@@ -8,9 +8,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.shell.standard.ShellComponent
-import org.springframework.shell.standard.ShellMethod
-import org.springframework.shell.standard.ShellOption
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import java.io.IOException
@@ -18,20 +15,16 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
-@ShellComponent
 @Component
-class MusicBrainzAlbumArtDownloader(private val restTemplate: RestTemplate) {
-    private val logger = LoggerFactory.getLogger(MusicBrainzAlbumArtDownloader::class.java)
-    private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
-    private val CAA_API_URL = "https://coverartarchive.org/"
+class CoverArtArchiveClient(
+    private val restTemplate: RestTemplate
+) {
 
-    @ShellMethod(key = ["download-art"], value = "Download album art using MusicBrainz ID")
-    fun downloadArt(
-        @ShellOption(help = "MusicBrainz ID") mbid: String,
-        @ShellOption(help = "Output file path", defaultValue = "album_cover.jpg") outputPath: String
-    ): String {
-        downloadAlbumArt(mbid, outputPath)
-        return "Album art downloaded to $outputPath"
+    private val logger = LoggerFactory.getLogger(CoverArtArchiveClient::class.java)
+
+    companion object {
+        private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
+        private val CAA_API_URL = "https://coverartarchive.org/"
     }
 
     fun downloadAlbumArt(mbid: String, outputPath: String) {

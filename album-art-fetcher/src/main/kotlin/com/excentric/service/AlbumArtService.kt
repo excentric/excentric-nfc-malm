@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 @Service
 class AlbumArtService(
     private val musicBrainzService: MusicBrainzService,
-    private val artDownloader: MusicBrainzAlbumArtDownloader
+    private val artDownloader: CoverArtArchiveService
 ) {
     fun findAndDownloadAlbumArt(artist: String, album: String, outputPath: String): String {
         val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
