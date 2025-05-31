@@ -1,5 +1,10 @@
 package com.excentric
 
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.shell.standard.ShellComponent
+import org.springframework.shell.standard.ShellMethod
+import org.springframework.shell.standard.ShellOption
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -9,19 +14,27 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.stream.Collectors
 
-object MusicBrainzMetadataFetcher {
-    private const val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
-    private const val MB_API_URL = "https://musicbrainz.org/ws/2/"
+@SpringBootApplication
+open class MusicBrainzApplication
 
-    @JvmStatic
-    fun main(args: Array<String>) {
-        // Search for Mezzanine by Massive Attack and download its album art
-        val artist = "Massive Attack"
-        val album = "Mezzanine"
+fun main(args: Array<String>) {
+    SpringApplication.run(MusicBrainzApplication::class.java, *args)
+}
 
+@ShellComponent
+class MusicBrainzMetadataFetcher {
+    private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
+    private val MB_API_URL = "https://musicbrainz.org/ws/2/"
+
+    @ShellMethod(key = ["find-mbid"], value = "Find MusicBrainz ID for an album")
+    fun findMbid(
+        @ShellOption(help = "Artist name") artist: String,
+        @ShellOption(help = "Album name") album: String
+    ): String {
         println("Searching for album: $album by artist: $artist")
         val mbid = findMbidByAlbumInfo(artist, album)
         println("Found MBID: $mbid")
+        return mbid
     }
 
     fun findMbidByAlbumInfo(artist: String, album: String): String {

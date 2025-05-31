@@ -1,5 +1,8 @@
 package com.excentric
 
+import org.springframework.shell.standard.ShellComponent
+import org.springframework.shell.standard.ShellMethod
+import org.springframework.shell.standard.ShellOption
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -7,13 +10,18 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
-object MusicBrainzAlbumArtDownloader {
-    private const val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
-    private const val CAA_API_URL = "https://coverartarchive.org/"
+@ShellComponent
+class MusicBrainzAlbumArtDownloader {
+    private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
+    private val CAA_API_URL = "https://coverartarchive.org/"
 
-    @JvmStatic
-    fun main(args: Array<String>) {
-        downloadAlbumArt("mbid", "album_cover.jpg")
+    @ShellMethod(key = ["download-art"], value = "Download album art using MusicBrainz ID")
+    fun downloadArt(
+        @ShellOption(help = "MusicBrainz ID") mbid: String,
+        @ShellOption(help = "Output file path", defaultValue = "album_cover.jpg") outputPath: String
+    ): String {
+        downloadAlbumArt(mbid, outputPath)
+        return "Album art downloaded to $outputPath"
     }
 
     fun downloadAlbumArt(mbid: String, outputPath: String) {
