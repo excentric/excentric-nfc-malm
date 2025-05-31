@@ -15,5 +15,5 @@ dependencies {
 }
 
 application {
-    mainClass = "com.excentric.MusicBrainzMetadataFetcherKt"
+    mainClass = "com.excentric.MusicBrainzApplicationKt"
 }
