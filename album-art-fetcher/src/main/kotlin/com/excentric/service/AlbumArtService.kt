@@ -1,4 +1,4 @@
-package com.excentric
+package com.excentric.service
 
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
@@ -7,19 +7,20 @@ import org.springframework.stereotype.Service
 
 @Service
 class AlbumArtService(
-    private val metadataFetcher: MusicBrainzMetadataFetcher,
+    private val musicBrainzService: MusicBrainzService,
     private val artDownloader: MusicBrainzAlbumArtDownloader
 ) {
     fun findAndDownloadAlbumArt(artist: String, album: String, outputPath: String): String {
-        val mbid = metadataFetcher.searchMusicBrainz(artist, album)
-        artDownloader.downloadAlbumArt(mbid, outputPath)
+        val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
+        albumMetadata?.let {
+            artDownloader.downloadAlbumArt(it.mbid, outputPath)
+        }
         return "Album art for '$album' by '$artist' downloaded to $outputPath"
     }
 }
 
 @ShellComponent
 class AlbumArtCommands(private val albumArtService: AlbumArtService) {
-    
     @ShellMethod(key = ["find-and-download"], value = "Find and download album art in one step")
     fun findAndDownload(
         @ShellOption(help = "Artist name") artist: String,

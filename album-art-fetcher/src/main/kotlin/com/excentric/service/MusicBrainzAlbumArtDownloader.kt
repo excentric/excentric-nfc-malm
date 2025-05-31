@@ -1,4 +1,4 @@
-package com.excentric
+package com.excentric.service
 
 import com.excentric.errors.MusicBrainzException
 import com.excentric.model.api.CoverArtResponseModel
