@@ -5,7 +5,9 @@ import com.excentric.errors.MalmException
 import com.excentric.service.CoverArtArchiveService
 import com.excentric.service.MusicBrainzService
 import com.excentric.storage.MetadataStorage
+import com.excentric.util.ConsoleColors.green
 import com.excentric.util.ConsoleColors.greenOrRed
+import com.excentric.util.ConsoleColors.red
 import org.jline.terminal.Terminal
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -66,7 +68,9 @@ class MalmShell(
         doSafely {
             val slots = metadataStorage.getSlots()
             slots.forEach { (index, metadata) ->
-                logger.info("Slot $index: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}")
+                val albumArtFile = metadataStorage.getAlbumArtFile(index)
+                val albumArtExists = if (albumArtFile.exists()) green("Yes") else red("No")
+                logger.info("Slot $index: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $albumArtExists")
             }
         }
     }
@@ -79,8 +83,20 @@ class MalmShell(
     }
 
     @ShellMethod(key = ["remove-slots", "rm"], value = "Delete all metadata slots from the metadata directory")
-    fun removeSlots() {
+    fun removeSlots(
+        @ShellOption(help = "Slot number (1-10)") slots: String
+    ) {
         doSafely { metadataStorage.removeAllSlots() }
+    }
+
+    @ShellMethod(key = ["print-slot-numbers"], value = "Print slot numbers")
+    fun printSlotNumbers(
+        @ShellOption(help = "Slot number (1-10)") slots: String
+    ) {
+        doSafely {
+
+
+        }
     }
 
     @ShellMethod(key = ["more-aa"], value = "Set to only show album covers from release year")
@@ -119,7 +135,6 @@ class MalmShell(
     ) {
         doSafelyWithResult {
             val albumArtFiles = metadataStorage.getAlbumArtsFiles(slot)
-            val albumArtFilesMap = albumArtFiles.mapIndexed { index, file -> "$index" to file }.toMap()
 
             val selectorItems = albumArtFiles.mapIndexed { index, file ->
                 val sizeInKB = file.length() / 1024
@@ -131,6 +146,7 @@ class MalmShell(
             val singleItemSelector = SingleItemSelector(terminal, selectorItems, "Select album art file from slot $slot:", null)
             singleItemSelector.setResourceLoader(this::resourceLoader.get())
             singleItemSelector.templateExecutor = templateExecutor
+            singleItemSelector.setMaxItems(20)
 
             val context = singleItemSelector.run(ComponentContext.empty())
 

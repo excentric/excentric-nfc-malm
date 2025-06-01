@@ -58,7 +58,7 @@ class MetadataStorage(
                 logger.error("Failed to read album metadata from file ${metadataFile.name}: ${e.message}")
             }
         }
-        return slots
+        return slots.toSortedMap()
     }
 
     private fun getMetadataFiles() = metadataDir.listFiles { file ->
@@ -118,5 +118,9 @@ class MetadataStorage(
             throw MalmException("No album art files found in slot $slot")
         }
         return files
+    }
+
+    fun getAlbumArtFile(index: Int): File {
+        return File(metadataDirPath, "$index.jpg")
     }
 }
