@@ -54,9 +54,9 @@ class MalmShell(
         metadataStorage.albumMetadata = albumMetadata
     }
 
-    @ShellMethod(key = ["save-to-slot", "s"], value = "Save current album metadata to a numbered slot (1-10)")
+    @ShellMethod(key = ["save-to-slot", "s"], value = "Save current album metadata to a numbered slot (1-99)")
     fun saveToSlot(
-        @ShellOption(help = "Slot number (1-10)") slot: Int
+        @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
         logger.info("Saving album metadata to slot: $slot")
         doSafely { metadataStorage.saveToSlot(slot) }
@@ -90,9 +90,13 @@ class MalmShell(
 
     @ShellMethod(key = ["download-album-art", "aa"], value = "Download album art from Cover Art Archive")
     fun downloadArt(
-        @ShellOption(help = "Slot number (1-10)") slot: Int
+        @ShellOption(help = "Slot numbers") slots: String
     ) {
-        doSafely { coverArtArchiveService.downloadAlbumArt(slot) }
+        doSafely {
+            parseSlotNumbers(slots).forEach { slot ->
+                coverArtArchiveService.downloadAlbumArt(slot)
+            }
+        }
     }
 
     @ShellMethod(key = ["remove-slots", "rm"], value = "Delete slots from the metadata directory")
@@ -121,7 +125,7 @@ class MalmShell(
 
     @ShellMethod(key = ["open-aa"], value = "List album art files in a slot and select one")
     fun openAlbumArt(
-        @ShellOption(help = "Slot number (1-10)") slot: Int
+        @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
         val albumArtsUri = metadataStorage.getAlbumArtsDir(slot).toURI()
 
@@ -139,7 +143,7 @@ class MalmShell(
 
     @ShellMethod(key = ["select-aa"], value = "List album art files in a slot and select one")
     fun selectAlbumArt(
-        @ShellOption(help = "Slot number (1-10)") slot: Int
+        @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
         doSafely {
             val albumArtFiles = metadataStorage.getPotentialAlbumArtsFiles(slot)

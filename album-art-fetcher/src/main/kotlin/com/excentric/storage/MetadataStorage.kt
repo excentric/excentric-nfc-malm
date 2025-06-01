@@ -66,8 +66,8 @@ class MetadataStorage(
     }.orEmpty()
 
     private fun validate(slot: Int, metadata: AlbumMetadata?) {
-        if (slot < 1 || slot > 10) {
-            throw MalmException("Invalid slot number: $slot. Must be between 1 and 10.")
+        if (slot < 1 || slot > 99) {
+            throw MalmException("Invalid slot number: $slot. Must be between 1 and 99.")
         }
 
         if (metadata == null) {
