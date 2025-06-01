@@ -1,5 +1,6 @@
 package com.excentric
 
+import com.excentric.config.MusicBrainzProperties
 import com.excentric.errors.MalmException
 import com.excentric.service.CoverArtArchiveService
 import com.excentric.service.MusicBrainzService
@@ -17,7 +18,8 @@ import kotlin.system.exitProcess
 class MalmShell(
     private val musicBrainzService: MusicBrainzService,
     private val coverArtArchiveService: CoverArtArchiveService,
-    private val metadataStorage: MetadataStorage
+    private val metadataStorage: MetadataStorage,
+    private val musicBrainzProperties: MusicBrainzProperties
 ) {
     private val logger = LoggerFactory.getLogger(MalmShell::class.java)
 
@@ -64,6 +66,18 @@ class MalmShell(
     @ShellMethod(key = ["remove-slots", "rm"], value = "Delete all metadata slots from the metadata directory")
     fun removeSlots() {
         doSafely { metadataStorage.removeAllSlots() }
+    }
+
+    @ShellMethod(key = ["more-aa"], value = "Set to only show album covers from release year")
+    fun moreAlbumArt() {
+        musicBrainzProperties.releaseYearCoversOnly = true
+        logger.info("Set releaseYearCoversOnly to true - only showing album covers from release year")
+    }
+
+    @ShellMethod(key = ["less-aa"], value = "Set to show all album covers, not just from release year")
+    fun lessAlbumArt() {
+        musicBrainzProperties.releaseYearCoversOnly = false
+        logger.info("Set releaseYearCoversOnly to false - showing all album covers")
     }
 
     private fun doSafely(command: () -> Unit) {
