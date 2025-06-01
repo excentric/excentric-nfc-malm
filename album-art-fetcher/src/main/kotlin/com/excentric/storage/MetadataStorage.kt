@@ -76,4 +76,34 @@ class MetadataStorage(
             throw MalmException("Metadata directory does not exist: $metadataDirPath")
         }
     }
+
+    fun removeAllSlots() {
+        validateMetadataDir()
+
+        val files = getMetadataFiles()
+        if (files.isEmpty()) {
+            logger.info("No metadata slots found to remove")
+            return
+        }
+
+        var successCount = 0
+        var failCount = 0
+
+        files.forEach { file ->
+            try {
+                if (file.delete()) {
+                    successCount++
+                    logger.info("Deleted metadata slot: ${file.nameWithoutExtension}")
+                } else {
+                    failCount++
+                    logger.error("Failed to delete metadata slot: ${file.nameWithoutExtension}")
+                }
+            } catch (e: Exception) {
+                failCount++
+                logger.error("Error deleting metadata slot ${file.nameWithoutExtension}: ${e.message}")
+            }
+        }
+
+        logger.info("Removed $successCount metadata slots" + if (failCount > 0) ", failed to remove $failCount slots" else "")
+    }
 }

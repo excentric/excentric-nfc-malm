@@ -25,7 +25,7 @@ class MalmShell(
         exitProcess(0)
     }
 
-    @ShellMethod(key = ["find-metadata", "f"], value = "Find MusicBrainz Metadata for an album")
+    @ShellMethod(key = ["find-metadata", "q"], value = "Find MusicBrainz Metadata for an album")
     fun findMusicBrainzAlbum(
         @ShellOption(help = "Album name") album: String,
         @ShellOption(help = "Artist name", defaultValue = "") artist: String,
@@ -48,9 +48,14 @@ class MalmShell(
         doSafely { metadataStorage.listSlots() }
     }
 
-    @ShellMethod(key = ["download-album-art"], value = "Download album art from Cover Art Archive")
+    @ShellMethod(key = ["download-album-art", "aa"], value = "Download album art from Cover Art Archive")
     fun downloadArt() {
         doSafely { coverArtArchiveService.downloadAlbumArt() }
+    }
+
+    @ShellMethod(key = ["remove-slots", "rm"], value = "Delete all metadata slots from the metadata directory")
+    fun removeSlots() {
+        doSafely { metadataStorage.removeAllSlots() }
     }
 
     private fun doSafely(command: () -> Unit) {
