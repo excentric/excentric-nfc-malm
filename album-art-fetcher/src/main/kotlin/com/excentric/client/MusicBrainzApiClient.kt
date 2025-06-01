@@ -1,9 +1,9 @@
 package com.excentric.client
 
+import com.excentric.config.MusicBrainzProperties
 import com.excentric.errors.MalmException
 import com.excentric.model.api.MusicBrainzResponseModel
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod.GET
 import org.springframework.stereotype.Component
@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class MusicBrainzApiClient(
-    @Value("\${music-album-label-maker.musicbrainz.api.url}") private val mbApiUrl: String
+    private val musicBrainzProperties: MusicBrainzProperties
 ) : AbstractClient() {
     private val logger = LoggerFactory.getLogger(MusicBrainzApiClient::class.java)
 
@@ -40,7 +40,7 @@ class MusicBrainzApiClient(
     }
 
     private fun buildSearchUrl(artist: String, album: String): String {
-        val uriBuilder = UriComponentsBuilder.fromUriString(mbApiUrl)
+        val uriBuilder = UriComponentsBuilder.fromUriString(musicBrainzProperties.api.url)
             .path("release")
             .queryParam("fmt", "json")
 
