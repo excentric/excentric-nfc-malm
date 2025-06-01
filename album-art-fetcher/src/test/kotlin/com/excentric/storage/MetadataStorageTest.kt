@@ -62,7 +62,7 @@ class MetadataStorageTest {
         metadataStorage.saveToSlot(2)
 
         // When
-        val slots = metadataStorage.getSlots()
+        val slots = metadataStorage.getSlotsMap()
 
         // Then
         assertEquals(2, slots.size)

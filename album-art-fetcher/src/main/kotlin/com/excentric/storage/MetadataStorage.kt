@@ -41,7 +41,7 @@ class MetadataStorage(
         }
     }
 
-    fun getSlots(): Map<Int, AlbumMetadata> {
+    fun getSlotsMap(): Map<Int, AlbumMetadata> {
         validateMetadataDir()
         val slots = mutableMapOf<Int, AlbumMetadata>()
 
@@ -97,6 +97,7 @@ class MetadataStorage(
         slotNumbers.forEach { slot ->
             File(metadataDirPath, "$slot.json").delete()
             File(metadataDirPath, "$slot.jpg").delete()
+            File(metadataDirPath, "$slot").deleteRecursively()
         }
 
         val newFileCount = metadataDir.listFiles()?.size ?: 0
@@ -117,22 +118,23 @@ class MetadataStorage(
         return File(metadataDirPath, "$slot")
     }
 
-    fun getAlbumArtsFiles(slot: Int): List<File> {
+    fun getPotentialAlbumArtsFiles(slot: Int): List<File> {
         val slotDir = getAlbumArtsDir(slot)
 
-        if (!slotDir.exists() || !slotDir.isDirectory) {
-            throw MalmException("No album art directory found for slot $slot")
+        if (slotDir.exists() && slotDir.isDirectory) {
+            return slotDir.listFiles()?.filter { it.isFile && !it.name.startsWith(".") } ?: emptyList()
         }
 
-        val files = slotDir.listFiles()?.filter { it.isFile && !it.name.startsWith(".") } ?: emptyList()
-
-        if (files.isEmpty()) {
-            throw MalmException("No album art files found in slot $slot")
-        }
-        return files
+        return emptyList()
     }
 
     fun getAlbumArtFile(index: Int): File {
         return File(metadataDirPath, "$index.jpg")
+    }
+
+    fun selectAlbumArt(slot: Int, selectedFile: File) {
+        // SC: we will keep the potential album art for now i think
+        selectedFile.copyTo(File(metadataDirPath, "$slot.jpg"), overwrite = true)
+        selectedFile.delete()
     }
 }

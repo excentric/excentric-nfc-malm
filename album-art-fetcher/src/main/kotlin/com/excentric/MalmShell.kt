@@ -8,10 +8,10 @@ import com.excentric.storage.MetadataStorage
 import com.excentric.util.ConsoleColors.green
 import com.excentric.util.ConsoleColors.greenOrRed
 import com.excentric.util.ConsoleColors.red
+import com.excentric.util.ConsoleColors.yellow
 import com.excentric.util.SlotArgumentParser.parseSlotNumbers
 import org.jline.terminal.Terminal
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.ResourceLoader
 import org.springframework.shell.component.SingleItemSelector
 import org.springframework.shell.component.context.ComponentContext
@@ -33,7 +33,6 @@ class MalmShell(
     private val coverArtArchiveService: CoverArtArchiveService,
     private val metadataStorage: MetadataStorage,
     private val musicBrainzProperties: MusicBrainzProperties,
-    @Value("\${music-album-label-maker.metadata-directory}")
     private val resourceLoader: ResourceLoader,
     private val terminal: Terminal,
     private val templateExecutor: TemplateExecutor,
@@ -64,12 +63,26 @@ class MalmShell(
     }
 
     @ShellMethod(key = ["list-slots", "ls"], value = "List all saved album metadata slots")
-    fun listSlots() {
+    fun listSlots(
+        @ShellOption(help = "Slot numbers", defaultValue = "") slots: String
+    ) {
         doSafely {
-            val slots = metadataStorage.getSlots()
-            slots.forEach { (index, metadata) ->
+            var slotsMap = metadataStorage.getSlotsMap()
+
+            if (slots.isNotEmpty() && slots != "*") {
+                val slotNumbers = parseSlotNumbers(slots)
+                slotsMap = slotsMap.filter { it.key in slotNumbers }
+            }
+
+            slotsMap.forEach { (index, metadata) ->
                 val albumArtFile = metadataStorage.getAlbumArtFile(index)
-                val albumArtExists = if (albumArtFile.exists()) green("Yes") else red("No")
+                val albumArtExists = if (albumArtFile.exists()) {
+                    green("Yes")
+                } else if (metadataStorage.getPotentialAlbumArtsFiles(index).isNotEmpty()) {
+                    yellow("Not Selected")
+                } else {
+                    red("No")
+                }
                 logger.info("Slot $index: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $albumArtExists")
             }
         }
@@ -128,8 +141,10 @@ class MalmShell(
     fun selectAlbumArt(
         @ShellOption(help = "Slot number (1-10)") slot: Int
     ) {
-        doSafelyWithResult {
-            val albumArtFiles = metadataStorage.getAlbumArtsFiles(slot)
+        doSafely {
+            val albumArtFiles = metadataStorage.getPotentialAlbumArtsFiles(slot)
+            if (albumArtFiles.isEmpty())
+                throw MalmException("No album art directory found for slot $slot")
 
             val selectorItems = albumArtFiles.mapIndexed { index, file ->
                 val sizeInKB = file.length() / 1024
@@ -138,20 +153,27 @@ class MalmShell(
 
             selectorItems.add(SelectorItem.of("None", "-1", true, true))
 
-            val singleItemSelector = SingleItemSelector(terminal, selectorItems, "Select album art file from slot $slot:", null)
-            singleItemSelector.setResourceLoader(resourceLoader)
-            singleItemSelector.templateExecutor = templateExecutor
-            singleItemSelector.setMaxItems(20)
-
+            val singleItemSelector = createSingleItemSelector(selectorItems, "Select album art file from slot $slot:")
             val context = singleItemSelector.run(ComponentContext.empty())
 
             if (!context.resultItem.isPresent) {
-                return@doSafelyWithResult "No file selected"
+                return@doSafely
             }
 
-            val selectedItem = context.resultItem.get()
-            val selectedFile = albumArtFiles.find { it.name == selectedItem.item }
-            logger.info("Selected item: $selectedFile")
+            albumArtFiles.find { it.name == context.resultItem.get().item }?.let { selectedFile ->
+                metadataStorage.selectAlbumArt(slot, selectedFile)
+            }
+        }
+    }
+
+    private fun createSingleItemSelector(
+        selectorItems: MutableList<SelectorItem<String>>,
+        message: String
+    ): SingleItemSelector<String, SelectorItem<String>> {
+        return SingleItemSelector(terminal, selectorItems, message, null).apply {
+            setResourceLoader(resourceLoader)
+            this.templateExecutor = this@MalmShell.templateExecutor
+            setMaxItems(20)
         }
     }
 
@@ -160,15 +182,6 @@ class MalmShell(
             command()
         } catch (e: MalmException) {
             logger.error(e.message)
-        }
-    }
-
-    private fun <T> doSafelyWithResult(command: () -> T): T {
-        try {
-            return command()
-        } catch (e: MalmException) {
-            logger.error(e.message)
-            throw e
         }
     }
 }

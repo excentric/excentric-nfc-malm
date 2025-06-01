@@ -13,7 +13,7 @@ class CoverArtArchiveService(
     private val logger = LoggerFactory.getLogger(CoverArtArchiveService::class.java)
 
     fun downloadAlbumArt(slot: Int) {
-        val slots = metadataStorage.getSlots()
+        val slots = metadataStorage.getSlotsMap()
         val albumMetadata = slots[slot]
         if (albumMetadata == null) {
             logger.error("No metadata found for slot: $slot")
