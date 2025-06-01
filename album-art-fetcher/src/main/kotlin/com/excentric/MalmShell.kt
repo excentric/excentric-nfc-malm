@@ -6,11 +6,19 @@ import com.excentric.service.CoverArtArchiveService
 import com.excentric.service.MusicBrainzService
 import com.excentric.storage.MetadataStorage
 import com.excentric.util.ConsoleColors.greenOrRed
+import org.jline.terminal.Terminal
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Lazy
+import org.springframework.shell.command.CommandContext
+import org.springframework.shell.component.SingleItemSelector
+import org.springframework.shell.component.context.ComponentContext
+import org.springframework.shell.component.support.SelectorItem
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
 import org.springframework.stereotype.Component
+import java.io.File
 import kotlin.system.exitProcess
 
 @ShellComponent
@@ -19,7 +27,9 @@ class MalmShell(
     private val musicBrainzService: MusicBrainzService,
     private val coverArtArchiveService: CoverArtArchiveService,
     private val metadataStorage: MetadataStorage,
-    private val musicBrainzProperties: MusicBrainzProperties
+    private val musicBrainzProperties: MusicBrainzProperties,
+    @Value("\${music-album-label-maker.metadata-directory}")
+    private val metadataDirPath: String,
 ) {
     private val logger = LoggerFactory.getLogger(MalmShell::class.java)
 
@@ -80,11 +90,85 @@ class MalmShell(
         logger.info("Set releaseYearCoversOnly to false - showing all album covers")
     }
 
+    @ShellMethod(key = ["select-aa"], value = "List album art files in a slot and select one")
+    fun selectAlbumArt(
+        @ShellOption(help = "Slot number (1-10)") slot: Int,
+        ctx: CommandContext
+    ): String {
+        return doSafelyWithResult {
+            val slotDir = File(metadataDirPath, "$slot")
+
+            if (!slotDir.exists() || !slotDir.isDirectory) {
+                throw MalmException("No album art directory found for slot $slot")
+            }
+
+            val files = slotDir.listFiles()?.filter { it.isFile } ?: emptyList()
+
+            if (files.isEmpty()) {
+                throw MalmException("No album art files found in slot $slot")
+            }
+
+            // Create selector items for each file with their index as the key
+            val items = files.mapIndexed { index, file ->
+                val sizeInKB = file.length() / 1024
+                // Store the file in a map with its index as the key
+                SelectorItem.of(index.toString(), "${file.name} (${sizeInKB} KB)")
+            }
+
+            // Create a map to look up files by their index
+            val fileMap = files.mapIndexed { index, file -> index.toString() to file }.toMap()
+
+            // Create and configure the selector
+            val selector = SingleItemSelector(
+                ctx.terminal,
+                items,
+                "Select album art file from slot $slot:",
+                null // No comparator needed for our use case
+            )
+
+            // Execute the selector and get the result
+            val componentContext = ComponentContext.empty()
+            val context = selector.run(componentContext)
+
+            // Check if a selection was made
+            if (!context.resultItem.isPresent) {
+                return@doSafelyWithResult "No file selected"
+            }
+
+            // Get the selected item
+            val selectedItem = context.resultItem.get()
+
+            // Debug the structure of the selected item
+            logger.info("Selected item: $selectedItem")
+
+            // Extract the key from the selected item's toString() representation
+            // The toString() format is expected to be something like "SelectorItem[key=0, ...]"
+            val key = selectedItem.toString().substringAfter("key=").substringBefore(",")
+            logger.info("Extracted key: $key")
+
+            // Get the selected file using the extracted key
+            val selectedFile = fileMap[key]
+                ?: throw MalmException("Failed to find selected file with key: $key")
+
+            // Return just the filename
+            selectedFile.name
+        }
+    }
+
     private fun doSafely(command: () -> Unit) {
         try {
             command()
         } catch (e: MalmException) {
             logger.error(e.message)
+        }
+    }
+
+    private fun <T> doSafelyWithResult(command: () -> T): T {
+        try {
+            return command()
+        } catch (e: MalmException) {
+            logger.error(e.message)
+            throw e
         }
     }
 }

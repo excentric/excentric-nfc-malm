@@ -1,6 +1,8 @@
 spring:
   main:
     web-application-type: none
+  shell:
+    noninteractive.enabled: false
 
 music-album-label-maker:
   api.user-agent: "MusicAlbumLabelMaker/0.0.1 (nfc-sonos@excentric.com)"
@@ -9,3 +11,4 @@ music-album-label-maker:
     release-year-covers-only: true
   cover-art-archive.url: https://coverartarchive.org/
   metadata-directory: ${user.home}/.album-metadata
+
