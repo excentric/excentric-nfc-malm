@@ -31,7 +31,7 @@ class MetadataStorageTest {
 
         // Set up a test album metadata
         metadataStorage.albumMetadata = AlbumMetadata(
-            mbid = "test-mbid",
+            mbids = listOf("test-mbid"),
             album = "Test Album",
             artist = "Test Artist",
             year = 2023
@@ -53,7 +53,7 @@ class MetadataStorageTest {
 
         // Save second album with different metadata
         val secondAlbum = AlbumMetadata(
-            mbid = "second-mbid",
+            mbids = listOf("second-mbid"),
             album = "Second Album",
             artist = "Second Artist",
             year = 2022
@@ -62,20 +62,20 @@ class MetadataStorageTest {
         metadataStorage.saveToSlot(2)
 
         // When
-        val result = metadataStorage.listSlots()
+        val result = metadataStorage.getSlots()
 
         // Then
         assertEquals(2, result.size)
 
         // Verify first album
-        val firstAlbum = result.find { it.mbid == "test-mbid" }
+        val firstAlbum = result.find { it.mbids[0] == "test-mbid" }
         assertNotNull(firstAlbum)
         assertEquals("Test Album", firstAlbum?.album)
         assertEquals("Test Artist", firstAlbum?.artist)
         assertEquals(2023, firstAlbum?.year)
 
         // Verify second album
-        val foundSecondAlbum = result.find { it.mbid == "second-mbid" }
+        val foundSecondAlbum = result.find { it.mbids[0] == "second-mbid" }
         assertNotNull(foundSecondAlbum)
         assertEquals("Second Album", foundSecondAlbum?.album)
         assertEquals("Second Artist", foundSecondAlbum?.artist)

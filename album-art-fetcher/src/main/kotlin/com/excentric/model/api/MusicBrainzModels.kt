@@ -8,11 +8,18 @@ data class MusicBrainzResponseModel(
     val releases: List<AlbumReleaseModel> = emptyList()
 ) {
     fun findEarliestReleaseYear(artistName: String?, albumName: String): Int? {
-        val sortedReleases = releases.filter { it.title == albumName && it.artistCredit.firstOrNull()?.name == artistName && it.getYear() != null }.sortedBy { it.getYear() }
+        val matchingReleases = findReleasesByAlbumAndArtist(albumName, artistName)
+        val sortedReleases = matchingReleases.filter { it.getYear() != null }.sortedBy { it.getYear() }
         if (sortedReleases.isEmpty()) {
             return null
         }
         return sortedReleases.first().getYear()
+    }
+
+    fun findReleasesByAlbumAndArtist(albumName: String, artistName: String?): List<AlbumReleaseModel> {
+        val matchingReleases = releases.filter { it.title == albumName && it.artistCredit.firstOrNull()?.name == artistName }
+        val officialReleases = matchingReleases.filter { it.status == "Official" }
+        return officialReleases
     }
 }
 
@@ -21,6 +28,7 @@ data class AlbumReleaseModel(
     val id: String,
     val title: String,
     val status: String? = null,
+    val score: Int? = null,
     @JsonProperty("artist-credit")
     val artistCredit: List<ArtistCreditModel> = emptyList(),
     val date: String? = null

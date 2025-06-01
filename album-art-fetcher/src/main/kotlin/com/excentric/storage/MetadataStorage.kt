@@ -2,10 +2,11 @@ package com.excentric.storage
 
 import com.excentric.errors.MalmException
 import com.excentric.model.storage.AlbumMetadata
-import com.excentric.util.ConsoleColors.greenOrRed
+import com.excentric.util.ConsoleColors
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 import java.io.File
 
@@ -40,19 +41,24 @@ class MetadataStorage(
         }
     }
 
-    fun listSlots(): List<AlbumMetadata> {
+    fun getSlots(): Map<Int, AlbumMetadata> {
         validateMetadataDir()
+        val slots = mutableMapOf<Int, AlbumMetadata>()
 
-        return getMetadataFiles().mapNotNull { metadataFile ->
+        getMetadataFiles().forEach { metadataFile ->
             try {
+                val slotIndex = metadataFile.nameWithoutExtension.toIntOrNull()
                 val metadata = objectMapper.readValue(metadataFile, AlbumMetadata::class.java)
-                logger.info("Slot ${metadataFile.nameWithoutExtension}: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}")
-                metadata
+
+                if (slotIndex != null)
+                    slots[slotIndex] = metadata
+                else
+                    logger.error("Failed to determine slot index: ${metadataFile.name}")
             } catch (e: Exception) {
                 logger.error("Failed to read album metadata from file ${metadataFile.name}: ${e.message}")
-                null
             }
         }
+        return slots
     }
 
     private fun getMetadataFiles() = metadataDir.listFiles { file ->
@@ -79,31 +85,19 @@ class MetadataStorage(
 
     fun removeAllSlots() {
         validateMetadataDir()
+        val originalFileCount = metadataDir.listFiles()?.size ?: 0
+        metadataDir.listFiles()?.forEach { it.delete() }
+        val newFileCount = metadataDir.listFiles()?.size ?: 0
+        logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
+    }
 
-        val files = getMetadataFiles()
-        if (files.isEmpty()) {
-            logger.info("No metadata slots found to remove")
-            return
+    fun saveAlbumArt(slot: Int, index: Int, mbid: String, albumArtResource: Resource) {
+        val slotDir = File(metadataDirPath, "$slot").also { it.mkdirs() }
+        val imageFile = File(slotDir, "$slot-$index-$mbid.jpg")
+
+        albumArtResource.inputStream.use { inputStream ->
+            imageFile.writeBytes(inputStream.readAllBytes())
+            logger.info("Album art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${imageFile.toURI()}")
         }
-
-        var successCount = 0
-        var failCount = 0
-
-        files.forEach { file ->
-            try {
-                if (file.delete()) {
-                    successCount++
-                    logger.info("Deleted metadata slot: ${file.nameWithoutExtension}")
-                } else {
-                    failCount++
-                    logger.error("Failed to delete metadata slot: ${file.nameWithoutExtension}")
-                }
-            } catch (e: Exception) {
-                failCount++
-                logger.error("Error deleting metadata slot ${file.nameWithoutExtension}: ${e.message}")
-            }
-        }
-
-        logger.info("Removed $successCount metadata slots" + if (failCount > 0) ", failed to remove $failCount slots" else "")
     }
 }

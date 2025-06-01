@@ -1,7 +1,7 @@
 package com.excentric.model.storage
 
 data class AlbumMetadata(
-    val mbid: String,
+    val mbids: List<String>,
     val album: String,
     val artist: String?,
     val year: Int?,

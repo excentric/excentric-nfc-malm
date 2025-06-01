@@ -4,6 +4,8 @@ spring:
 
 music-album-label-maker:
   api.user-agent: "MusicAlbumLabelMaker/0.0.1 (nfc-sonos@excentric.com)"
-  musicbrainz.api.url: https://musicbrainz.org/ws/2/
+  musicbrainz:
+    api.url: https://musicbrainz.org/ws/2/
+    release-year-covers-only: true
   cover-art-archive.url: https://coverartarchive.org/
   metadata-directory: ${user.home}/.album-metadata

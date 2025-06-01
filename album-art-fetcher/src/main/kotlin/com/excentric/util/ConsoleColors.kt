@@ -11,4 +11,12 @@ object ConsoleColors {
         }
         return "$GREEN$text$RESET"
     }
+
+    fun green(text: String): String {
+        return "$GREEN$text$RESET"
+    }
+
+    fun red(text: String): String {
+        return "${RED}${text}$RESET"
+    }
 }

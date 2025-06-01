@@ -2,23 +2,31 @@ package com.excentric.client
 
 import com.excentric.errors.MalmException
 import com.excentric.model.api.CoverArtResponseModel
+import com.excentric.storage.MetadataStorage
+import com.excentric.util.ConsoleColors
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
-import java.io.File
-import java.io.IOException
+import java.util.Locale.getDefault
 
 @Component
 class CoverArtArchiveClient(
+    private val metadataStorage: MetadataStorage,
     @Value("\${music-album-label-maker.cover-art-archive.url}")
     private val coverArtArchiveApiUrl: String
 ) : AbstractClient() {
     private val logger = LoggerFactory.getLogger(CoverArtArchiveClient::class.java)
 
-    fun downloadAlbumArt(mbid: String) {
+    fun downloadAlbumArt(slot: Int, mbids: List<String>) {
+        mbids.forEachIndexed { index, mbid ->
+            downloadAlbumArt(slot, mbid, index)
+        }
+    }
+
+    private fun downloadAlbumArt(slot: Int, mbid: String, index: Int) {
         try {
             val response = restTemplate.exchange(
                 getImageMetadataApiUrl(mbid),
@@ -42,18 +50,16 @@ class CoverArtArchiveClient(
             )
 
             val imageResource = imageResponse.body
-                ?: throw MalmException("Failed to download image from ${frontCover.imageUrl}")
+                ?: throw MalmException("Not found")
 
-            val tempImageFile = File.createTempFile("album-art", ".png")
-
-            // Save the image to a temporary file
-            imageResource.inputStream.use { inputStream ->
-                tempImageFile.writeBytes(inputStream.readAllBytes())
-                logger.info("Album art downloaded successfully to: ${tempImageFile.toURI()}")
+            if (imageResponse.headers.contentType?.type?.lowercase(getDefault()) != "image") {
+                throw MalmException("Not an image")
             }
-        } catch (e: IOException) {
-            logger.error("Failed to download album art: {}", e.message)
-            throw e
+
+            metadataStorage.saveAlbumArt(slot, index, mbid, imageResource)
+
+        } catch (e: Exception) {
+            logger.warn("Album art [${ConsoleColors.red(mbid)}] failed to download: ${e.message}")
         }
     }
 

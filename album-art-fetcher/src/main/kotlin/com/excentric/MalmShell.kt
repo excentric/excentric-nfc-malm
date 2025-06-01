@@ -4,6 +4,7 @@ import com.excentric.errors.MalmException
 import com.excentric.service.CoverArtArchiveService
 import com.excentric.service.MusicBrainzService
 import com.excentric.storage.MetadataStorage
+import com.excentric.util.ConsoleColors.greenOrRed
 import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
@@ -25,7 +26,7 @@ class MalmShell(
         exitProcess(0)
     }
 
-    @ShellMethod(key = ["find-metadata", "q"], value = "Find MusicBrainz Metadata for an album")
+    @ShellMethod(key = ["find-metadata", "f"], value = "Find MusicBrainz Metadata for an album")
     fun findMusicBrainzAlbum(
         @ShellOption(help = "Album name") album: String,
         @ShellOption(help = "Artist name", defaultValue = "") artist: String,
@@ -45,12 +46,19 @@ class MalmShell(
 
     @ShellMethod(key = ["list-slots", "ls"], value = "List all saved album metadata slots")
     fun listSlots() {
-        doSafely { metadataStorage.listSlots() }
+        doSafely {
+            val slots = metadataStorage.getSlots()
+            slots.forEach { (index, metadata) ->
+                logger.info("Slot $index: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}")
+            }
+        }
     }
 
     @ShellMethod(key = ["download-album-art", "aa"], value = "Download album art from Cover Art Archive")
-    fun downloadArt() {
-        doSafely { coverArtArchiveService.downloadAlbumArt() }
+    fun downloadArt(
+        @ShellOption(help = "Slot number (1-10)") slot: Int
+    ) {
+        doSafely { coverArtArchiveService.downloadAlbumArt(slot) }
     }
 
     @ShellMethod(key = ["remove-slots", "rm"], value = "Delete all metadata slots from the metadata directory")
