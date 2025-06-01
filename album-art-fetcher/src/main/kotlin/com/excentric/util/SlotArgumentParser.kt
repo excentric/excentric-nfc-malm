@@ -1,10 +1,10 @@
 package com.excentric.util
 
-import com.excentric.MalmShell
+import com.excentric.MalmShellCommands
 import org.slf4j.LoggerFactory
 
 object SlotArgumentParser {
-    private val logger = LoggerFactory.getLogger(MalmShell::class.java)
+    private val logger = LoggerFactory.getLogger(MalmShellCommands::class.java)
 
     fun parseSlotNumbers(slots: String): List<Int> {
         val result = mutableListOf<Int>()

@@ -1,6 +1,5 @@
 package com.excentric
 
-import com.excentric.config.MusicBrainzProperties
 import com.excentric.errors.MalmException
 import com.excentric.service.CoverArtArchiveService
 import com.excentric.service.MusicBrainzService
@@ -20,29 +19,20 @@ import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
 import org.springframework.shell.style.TemplateExecutor
-import org.springframework.stereotype.Component
 import java.awt.Desktop
 import java.awt.Desktop.Action.BROWSE
 import java.util.Locale.getDefault
-import kotlin.system.exitProcess
 
-@ShellComponent
-@Component
-class MalmShell(
+@ShellComponent("Main shell commands")
+class MalmShellCommands(
     private val musicBrainzService: MusicBrainzService,
     private val coverArtArchiveService: CoverArtArchiveService,
     private val metadataStorage: MetadataStorage,
-    private val musicBrainzProperties: MusicBrainzProperties,
     private val resourceLoader: ResourceLoader,
     private val terminal: Terminal,
     private val templateExecutor: TemplateExecutor,
 ) {
-    private val logger = LoggerFactory.getLogger(MalmShell::class.java)
-
-    @ShellMethod(key = ["q"], value = "Exit the application immediately")
-    fun quit() {
-        exitProcess(0)
-    }
+    private val logger = LoggerFactory.getLogger(MalmShellCommands::class.java)
 
     @ShellMethod(key = ["find-metadata", "f"], value = "Find MusicBrainz Metadata for an album")
     fun findMusicBrainzAlbum(
@@ -111,18 +101,6 @@ class MalmShell(
         }
     }
 
-    @ShellMethod(key = ["more-aa"], value = "Set to only show album covers from release year")
-    fun moreAlbumArt() {
-        musicBrainzProperties.releaseYearCoversOnly = false
-        logger.info("Set releaseYearCoversOnly to true - only showing album covers from release year")
-    }
-
-    @ShellMethod(key = ["less-aa"], value = "Set to show all album covers, not just from release year")
-    fun lessAlbumArt() {
-        musicBrainzProperties.releaseYearCoversOnly = true
-        logger.info("Set releaseYearCoversOnly to false - showing all album covers")
-    }
-
     @ShellMethod(key = ["open-aa"], value = "List album art files in a slot and select one")
     fun openAlbumArt(
         @ShellOption(help = "Slot number (1-99)") slot: Int
@@ -170,13 +148,24 @@ class MalmShell(
         }
     }
 
+    @ShellMethod(key = ["move-slot", "mv"], value = "Move a slot from one position to another")
+    fun moveSlot(
+        @ShellOption(help = "Source slot number (1-99)") sourceSlot: Int,
+        @ShellOption(help = "Target slot number (1-99)") targetSlot: Int
+    ) {
+        doSafely {
+            metadataStorage.moveSlot(sourceSlot, targetSlot)
+            logger.info("Moved slot $sourceSlot to slot $targetSlot")
+        }
+    }
+
     private fun createSingleItemSelector(
         selectorItems: MutableList<SelectorItem<String>>,
         message: String
     ): SingleItemSelector<String, SelectorItem<String>> {
         return SingleItemSelector(terminal, selectorItems, message, null).apply {
             setResourceLoader(resourceLoader)
-            this.templateExecutor = this@MalmShell.templateExecutor
+            this.templateExecutor = this@MalmShellCommands.templateExecutor
             setMaxItems(20)
         }
     }

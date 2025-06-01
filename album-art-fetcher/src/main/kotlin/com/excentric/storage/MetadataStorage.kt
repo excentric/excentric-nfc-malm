@@ -137,4 +137,32 @@ class MetadataStorage(
         selectedFile.copyTo(File(metadataDirPath, "$slot.jpg"), overwrite = true)
         selectedFile.delete()
     }
+
+    fun moveSlot(sourceSlot: Int, targetSlot: Int) {
+        if ((sourceSlot < 1 || sourceSlot > 99) || (targetSlot < 1 || targetSlot > 99) || sourceSlot == targetSlot) {
+            throw MalmException("Invalid slot numbers: $sourceSlot : $targetSlot")
+        }
+
+        validateMetadataDir()
+
+        val sourceJsonFile = File(metadataDirPath, "$sourceSlot.json")
+        sourceJsonFile.copyTo(File(metadataDirPath, "$targetSlot.json"), true)
+        sourceJsonFile.delete()
+
+        val sourceJpgFile = File(metadataDirPath, "$sourceSlot.jpg")
+        if (sourceJpgFile.exists()) {
+            sourceJpgFile.copyTo(File(metadataDirPath, "$targetSlot.jpg"), true)
+            sourceJpgFile.delete()
+        }
+
+        val sourceAlbumArtDir = File(metadataDirPath, "$sourceSlot")
+        if (sourceAlbumArtDir.exists() && sourceAlbumArtDir.isDirectory) {
+            val targetAlbumDir = File(metadataDirPath, "$targetSlot")
+            targetAlbumDir.deleteRecursively()
+            sourceAlbumArtDir.copyRecursively(targetAlbumDir)
+            sourceAlbumArtDir.deleteRecursively()
+        }
+
+        logger.info("Successfully moved slot $sourceSlot to slot $targetSlot")
+    }
 }
