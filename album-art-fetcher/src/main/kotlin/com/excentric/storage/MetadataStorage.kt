@@ -86,18 +86,37 @@ class MetadataStorage(
     fun removeAllSlots() {
         validateMetadataDir()
         val originalFileCount = metadataDir.listFiles()?.size ?: 0
-        metadataDir.listFiles()?.forEach { it.delete() }
+        metadataDir.listFiles()?.forEach { it.deleteRecursively() }
         val newFileCount = metadataDir.listFiles()?.size ?: 0
         logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
     }
 
     fun saveAlbumArt(slot: Int, index: Int, mbid: String, albumArtResource: Resource) {
         val slotDir = File(metadataDirPath, "$slot").also { it.mkdirs() }
-        val imageFile = File(slotDir, "$slot-$index-$mbid.jpg")
+        val imageFile = File(slotDir, "${index.toString().padStart(2, '0')}.jpg")
 
         albumArtResource.inputStream.use { inputStream ->
             imageFile.writeBytes(inputStream.readAllBytes())
             logger.info("Album art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${imageFile.toURI()}")
         }
+    }
+
+    fun getAlbumArtsDir(slot: Int): File {
+        return File(metadataDirPath, "$slot")
+    }
+
+    fun getAlbumArtsFiles(slot: Int): List<File> {
+        val slotDir = getAlbumArtsDir(slot)
+
+        if (!slotDir.exists() || !slotDir.isDirectory) {
+            throw MalmException("No album art directory found for slot $slot")
+        }
+
+        val files = slotDir.listFiles()?.filter { it.isFile && !it.name.startsWith(".") } ?: emptyList()
+
+        if (files.isEmpty()) {
+            throw MalmException("No album art files found in slot $slot")
+        }
+        return files
     }
 }
