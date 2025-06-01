@@ -1,23 +1,18 @@
 package com.excentric.client
 
-import com.excentric.errors.MusicBrainzException
+import com.excentric.errors.MalmException
 import com.excentric.model.api.MusicBrainzResponseModel
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod.GET
-import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class MusicBrainzApiClient(
-    private val restTemplate: RestTemplate,
-    @Value("\${music-album-label-maker.musicbrainz.api.user-agent}") private val userAgent: String,
     @Value("\${music-album-label-maker.musicbrainz.api.url}") private val mbApiUrl: String
-) {
+) : AbstractClient() {
     private val logger = LoggerFactory.getLogger(MusicBrainzApiClient::class.java)
 
     fun searchAlbums(artist: String, album: String): MusicBrainzResponseModel {
@@ -28,7 +23,7 @@ class MusicBrainzApiClient(
         val response = restTemplate.exchange(
             searchUrl,
             GET,
-            HttpEntity<MusicBrainzResponseModel>(buildHttpHeaders()),
+            HttpEntity<MusicBrainzResponseModel>(buildRestHttpHeaders()),
             MusicBrainzResponseModel::class.java
         )
 
@@ -36,19 +31,12 @@ class MusicBrainzApiClient(
     }
 
     private fun validateModel(musicBrainzResponseModel: MusicBrainzResponseModel?): MusicBrainzResponseModel {
-        val musicBrainzResponse = musicBrainzResponseModel ?: throw MusicBrainzException("Empty response from MusicBrainz API")
+        val musicBrainzResponse = musicBrainzResponseModel ?: throw MalmException("Empty response from MusicBrainz API")
 
         if (musicBrainzResponse.releases.isEmpty()) {
-            throw MusicBrainzException("No releases found in the response")
+            throw MalmException("No releases found in the response")
         }
         return musicBrainzResponse
-    }
-
-    private fun buildHttpHeaders(): HttpHeaders {
-        return HttpHeaders().apply {
-            set("User-Agent", userAgent)
-            accept = listOf(APPLICATION_JSON)
-        }
     }
 
     private fun buildSearchUrl(artist: String, album: String): String {

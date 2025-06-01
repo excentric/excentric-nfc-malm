@@ -20,5 +20,5 @@ dependencies {
 }
 
 application {
-    mainClass = "com.excentric.MusicBrainzApplicationKt"
+    mainClass = "com.excentric.MalmApplicationKt"
 }

@@ -15,7 +15,8 @@ data class CoverArtImageModel(
     val front: Boolean = false,
     val back: Boolean = false,
     val approved: Boolean = false,
-    val image: String, // URL to the full-size image
+    @JsonProperty("image")
+    val imageUrl: String, // URL to the full-size image
     val thumbnails: ThumbnailsModel? = null
 )
 

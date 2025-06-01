@@ -1,6 +1,6 @@
 package com.excentric.storage
 
-import com.excentric.errors.MusicBrainzException
+import com.excentric.errors.MalmException
 import com.excentric.model.storage.AlbumMetadata
 import com.excentric.util.ConsoleColors.greenOrRed
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -36,7 +36,7 @@ class MetadataStorage(
             objectMapper.writeValue(metadataFile, metadata)
             logger.info("Successfully saved album metadata to slot $slot")
         } catch (e: Exception) {
-            throw MusicBrainzException("Failed to save album metadata to slot $slot: ${e.message}")
+            throw MalmException("Failed to save album metadata to slot $slot: ${e.message}")
         }
     }
 
@@ -61,11 +61,11 @@ class MetadataStorage(
 
     private fun validate(slot: Int, metadata: AlbumMetadata?) {
         if (slot < 1 || slot > 10) {
-            throw MusicBrainzException("Invalid slot number: $slot. Must be between 1 and 10.")
+            throw MalmException("Invalid slot number: $slot. Must be between 1 and 10.")
         }
 
         if (metadata == null) {
-            throw MusicBrainzException("No album metadata available to save")
+            throw MalmException("No album metadata available to save")
         }
 
         validateMetadataDir()
@@ -73,7 +73,7 @@ class MetadataStorage(
 
     private fun validateMetadataDir() {
         if (!metadataDir.exists() || !metadataDir.isDirectory) {
-            throw MusicBrainzException("Metadata directory does not exist: $metadataDirPath")
+            throw MalmException("Metadata directory does not exist: $metadataDirPath")
         }
     }
 }

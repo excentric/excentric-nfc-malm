@@ -1,84 +1,61 @@
 package com.excentric.client
 
-import com.excentric.errors.MusicBrainzException
+import com.excentric.errors.MalmException
 import com.excentric.model.api.CoverArtResponseModel
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
+import java.io.File
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 
 @Component
 class CoverArtArchiveClient(
-    private val restTemplate: RestTemplate
-) {
-
+    @Value("\${music-album-label-maker.cover-art-archive.url}")
+    private val coverArtArchiveApiUrl: String
+) : AbstractClient() {
     private val logger = LoggerFactory.getLogger(CoverArtArchiveClient::class.java)
 
-    companion object {
-        private val USER_AGENT = "MyMusicApp/1.0 (nfc-sonos@excentric.com)"
-        private val CAA_API_URL = "https://coverartarchive.org/"
-    }
-
-    fun downloadAlbumArt(mbid: String, outputPath: String) {
+    fun downloadAlbumArt(mbid: String) {
         try {
-            // Construct the URL for the front cover image
-            val url = CAA_API_URL + "release/" + mbid
-
-            // Set up headers
-            val headers = HttpHeaders()
-            headers.set("User-Agent", USER_AGENT)
-            headers.accept = listOf(MediaType.APPLICATION_JSON)
-
-            // First, get the cover art metadata
-            val entity = HttpEntity<String>(headers)
             val response = restTemplate.exchange(
-                url,
+                getImageMetadataApiUrl(mbid),
                 HttpMethod.GET,
-                entity,
+                HttpEntity<String>(buildRestHttpHeaders()),
                 CoverArtResponseModel::class.java
             )
 
             val coverArtResponse = response.body
-                ?: throw MusicBrainzException("Empty response from Cover Art Archive API")
+                ?: throw MalmException("Empty response from Cover Art Archive API")
 
             // Find the front cover image
             val frontCover = coverArtResponse.images.find { it.front }
-                ?: throw MusicBrainzException("No front cover found for release $mbid")
-
-            // Get the image URL (prefer large size if available)
-            val imageUrl = frontCover.thumbnails?.large ?: frontCover.image
-
-            // Now download the actual image
-            val imageHeaders = HttpHeaders()
-            imageHeaders.set("User-Agent", USER_AGENT)
-            val imageEntity = HttpEntity<String>(imageHeaders)
+                ?: throw MalmException("No front cover found for release $mbid")
 
             val imageResponse = restTemplate.exchange(
-                imageUrl,
+                frontCover.imageUrl,
                 HttpMethod.GET,
-                imageEntity,
+                HttpEntity<String>(buildImageHttpHeaders()),
                 Resource::class.java
             )
 
             val imageResource = imageResponse.body
-                ?: throw MusicBrainzException("Failed to download image from $imageUrl")
+                ?: throw MalmException("Failed to download image from ${frontCover.imageUrl}")
 
-            // Save the image to the output path
+            val tempImageFile = File.createTempFile("album-art", ".png")
+
+            // Save the image to a temporary file
             imageResource.inputStream.use { inputStream ->
-                Files.copy(inputStream, Path.of(outputPath), StandardCopyOption.REPLACE_EXISTING)
-                logger.info("Album art downloaded successfully to: $outputPath")
+                tempImageFile.writeBytes(inputStream.readAllBytes())
+                logger.info("Album art downloaded successfully to: ${tempImageFile.toURI()}")
             }
         } catch (e: IOException) {
             logger.error("Failed to download album art: {}", e.message)
             throw e
         }
     }
+
+    private fun getImageMetadataApiUrl(mbid: String) = "${coverArtArchiveApiUrl}release/$mbid"
 }

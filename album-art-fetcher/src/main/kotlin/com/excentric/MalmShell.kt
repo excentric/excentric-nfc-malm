@@ -1,6 +1,7 @@
 package com.excentric
 
-import com.excentric.errors.MusicBrainzException
+import com.excentric.errors.MalmException
+import com.excentric.service.CoverArtArchiveService
 import com.excentric.service.MusicBrainzService
 import com.excentric.storage.MetadataStorage
 import org.slf4j.LoggerFactory
@@ -12,11 +13,12 @@ import kotlin.system.exitProcess
 
 @ShellComponent
 @Component
-class MusicBrainzShell(
+class MalmShell(
     private val musicBrainzService: MusicBrainzService,
+    private val coverArtArchiveService: CoverArtArchiveService,
     private val metadataStorage: MetadataStorage
 ) {
-    private val logger = LoggerFactory.getLogger(MusicBrainzShell::class.java)
+    private val logger = LoggerFactory.getLogger(MalmShell::class.java)
 
     @ShellMethod(key = ["q"], value = "Exit the application immediately")
     fun quit() {
@@ -46,10 +48,15 @@ class MusicBrainzShell(
         doSafely { metadataStorage.listSlots() }
     }
 
+    @ShellMethod(key = ["download-album-art"], value = "Download album art from Cover Art Archive")
+    fun downloadArt() {
+        doSafely { coverArtArchiveService.downloadAlbumArt() }
+    }
+
     private fun doSafely(command: () -> Unit) {
         try {
             command()
-        } catch (e: MusicBrainzException) {
+        } catch (e: MalmException) {
             logger.error(e.message)
         }
     }
