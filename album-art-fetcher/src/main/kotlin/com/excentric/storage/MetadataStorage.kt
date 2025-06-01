@@ -91,6 +91,18 @@ class MetadataStorage(
         logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
     }
 
+    fun removeSlots(slotNumbers: List<Int>) {
+        validateMetadataDir()
+        val originalFileCount = metadataDir.listFiles()?.size ?: 0
+        slotNumbers.forEach { slot ->
+            File(metadataDirPath, "$slot.json").delete()
+            File(metadataDirPath, "$slot.jpg").delete()
+        }
+
+        val newFileCount = metadataDir.listFiles()?.size ?: 0
+        logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
+    }
+
     fun saveAlbumArt(slot: Int, index: Int, mbid: String, albumArtResource: Resource) {
         val slotDir = File(metadataDirPath, "$slot").also { it.mkdirs() }
         val imageFile = File(slotDir, "${index.toString().padStart(2, '0')}.jpg")

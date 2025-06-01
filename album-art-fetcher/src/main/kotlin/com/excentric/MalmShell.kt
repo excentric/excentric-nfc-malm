@@ -8,6 +8,7 @@ import com.excentric.storage.MetadataStorage
 import com.excentric.util.ConsoleColors.green
 import com.excentric.util.ConsoleColors.greenOrRed
 import com.excentric.util.ConsoleColors.red
+import com.excentric.util.SlotArgumentParser.parseSlotNumbers
 import org.jline.terminal.Terminal
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -33,7 +34,6 @@ class MalmShell(
     private val metadataStorage: MetadataStorage,
     private val musicBrainzProperties: MusicBrainzProperties,
     @Value("\${music-album-label-maker.metadata-directory}")
-    private val metadataDirPath: String,
     private val resourceLoader: ResourceLoader,
     private val terminal: Terminal,
     private val templateExecutor: TemplateExecutor,
@@ -82,20 +82,15 @@ class MalmShell(
         doSafely { coverArtArchiveService.downloadAlbumArt(slot) }
     }
 
-    @ShellMethod(key = ["remove-slots", "rm"], value = "Delete all metadata slots from the metadata directory")
+    @ShellMethod(key = ["remove-slots", "rm"], value = "Delete slots from the metadata directory")
     fun removeSlots(
-        @ShellOption(help = "Slot number (1-10)") slots: String
-    ) {
-        doSafely { metadataStorage.removeAllSlots() }
-    }
-
-    @ShellMethod(key = ["print-slot-numbers"], value = "Print slot numbers")
-    fun printSlotNumbers(
-        @ShellOption(help = "Slot number (1-10)") slots: String
+        @ShellOption(help = "Slot numbers") slots: String
     ) {
         doSafely {
-
-
+            if (slots == "*")
+                metadataStorage.removeAllSlots()
+            else
+                metadataStorage.removeSlots(parseSlotNumbers(slots))
         }
     }
 
@@ -144,7 +139,7 @@ class MalmShell(
             selectorItems.add(SelectorItem.of("None", "-1", true, true))
 
             val singleItemSelector = SingleItemSelector(terminal, selectorItems, "Select album art file from slot $slot:", null)
-            singleItemSelector.setResourceLoader(this::resourceLoader.get())
+            singleItemSelector.setResourceLoader(resourceLoader)
             singleItemSelector.templateExecutor = templateExecutor
             singleItemSelector.setMaxItems(20)
 
