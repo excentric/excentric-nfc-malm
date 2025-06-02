@@ -25,7 +25,6 @@ import java.util.Locale.getDefault
 
 @ShellComponent
 class MalmShellCommands(
-    private val musicBrainzService: MusicBrainzService,
     private val coverArtArchiveService: CoverArtArchiveService,
     private val metadataStorage: MetadataStorage,
     private val resourceLoader: ResourceLoader,
@@ -33,16 +32,6 @@ class MalmShellCommands(
     private val templateExecutor: TemplateExecutor,
 ) {
     private val logger = LoggerFactory.getLogger(MalmShellCommands::class.java)
-
-    @ShellMethod(key = ["find-metadata", "f"], value = "Find MusicBrainz Metadata for an album")
-    fun findMusicBrainzAlbum(
-        @ShellOption(help = "Album name") album: String,
-        @ShellOption(help = "Artist name", defaultValue = "") artist: String,
-    ) {
-        logger.info("Searching for album: $album by artist: $artist")
-        val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
-        metadataStorage.albumMetadata = albumMetadata
-    }
 
     @ShellMethod(key = ["save-to-slot", "s"], value = "Save current album metadata to a numbered slot (1-99)")
     fun saveToSlot(

@@ -1,6 +1,7 @@
 package com.excentric
 
 import com.excentric.service.MusicBrainzService
+import com.excentric.storage.MetadataStorage
 import com.excentric.util.ConsoleColors.green
 import com.excentric.util.ConsoleColors.red
 import org.slf4j.Logger
@@ -12,9 +13,20 @@ import org.springframework.shell.standard.ShellOption
 @ShellComponent
 class MusicBrainzCommands(
     private val musicBrainzService: MusicBrainzService,
+    private val metadataStorage: MetadataStorage,
 ) : AbstractShellCommands() {
 
     override val logger: Logger = LoggerFactory.getLogger(MusicBrainzCommands::class.java)
+
+    @ShellMethod(key = ["mb-search", "mbs"], value = "Search MusicBrainz for album and artist")
+    fun findMusicBrainzAlbum(
+        @ShellOption(help = "Album name") album: String,
+        @ShellOption(help = "Artist name", defaultValue = "") artist: String,
+    ) {
+        logger.info("Searching for album: $album by artist: $artist")
+        val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
+        metadataStorage.albumMetadata = albumMetadata
+    }
 
     @ShellMethod(key = ["mb-search-artist", "mbsa"], value = "Search MusicBrainz by artist name")
     fun musicBrainzSearchByArtistName(
