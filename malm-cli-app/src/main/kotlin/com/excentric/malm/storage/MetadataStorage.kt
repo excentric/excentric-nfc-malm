@@ -2,11 +2,9 @@ package com.excentric.malm.storage
 
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.metadata.AlbumMetadata
-import com.excentric.malm.util.ConsoleColors
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 import java.io.File
 
@@ -104,12 +102,10 @@ class MetadataStorage(
         logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
     }
 
-    fun saveCoverArt(slot: Int, potentialCoverArtIndex: Int, mbid: String, coverArtResource: Resource) {
-        val imageFile = getPotentialCoverArtFile(slot, potentialCoverArtIndex)
-
-        coverArtResource.inputStream.use { inputStream ->
-            imageFile.writeBytes(inputStream.readAllBytes())
-            logger.info("Cover art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${imageFile.toURI()}")
+    fun saveCoverArt(slot: Int, coverArtFiles: List<File>) {
+        coverArtFiles.forEachIndexed { index, coverArtFile ->
+            val imageFile = getPotentialCoverArtFile(slot, index)
+            coverArtFile.copyTo(imageFile, overwrite = true)
         }
     }
 

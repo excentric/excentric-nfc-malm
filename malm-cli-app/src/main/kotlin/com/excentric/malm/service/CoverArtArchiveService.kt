@@ -18,7 +18,11 @@ class CoverArtArchiveService(
         if (albumMetadata == null) {
             logger.error("No metadata found for slot: $slot")
         } else {
-            coverArtArchiveClient.downloadCoverArt(slot, albumMetadata.mbids)
+            val potentialCoverArtFiles = albumMetadata.mbids.mapNotNull { mbid ->
+                coverArtArchiveClient.downloadCoverArt(mbid)
+            }
+
+            metadataStorage.saveCoverArt(slot, potentialCoverArtFiles)
         }
     }
 }

@@ -2,7 +2,6 @@ package com.excentric.malm.client
 
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.model.CoverArtResponseModel
-import com.excentric.malm.storage.MetadataStorage
 import com.excentric.malm.util.ConsoleColors
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -10,23 +9,17 @@ import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
+import java.io.File
 import java.util.Locale.getDefault
 
 @Component
 class CoverArtArchiveClient(
-    private val metadataStorage: MetadataStorage,
     @Value("\${music-album-label-maker.cover-art-archive.url}")
     private val coverArtArchiveApiUrl: String
 ) : AbstractClient() {
     private val logger = LoggerFactory.getLogger(CoverArtArchiveClient::class.java)
 
-    fun downloadCoverArt(slot: Int, mbids: List<String>) {
-        mbids.forEachIndexed { index, mbid ->
-            downloadCoverArt(slot, mbid, index)
-        }
-    }
-
-    private fun downloadCoverArt(slot: Int, mbid: String, index: Int) {
+    fun downloadCoverArt(mbid: String) : File? {
         try {
             val response = restTemplate.exchange(
                 getImageMetadataApiUrl(mbid),
@@ -56,10 +49,19 @@ class CoverArtArchiveClient(
                 throw MalmException("Not an image")
             }
 
-            metadataStorage.saveCoverArt(slot, index, mbid, imageResource)
+            val tempImageFile = File.createTempFile("", ".jpg").apply {
+                deleteOnExit()
+            }
 
+            imageResource.inputStream.use { inputStream ->
+                tempImageFile.writeBytes(inputStream.readAllBytes())
+                logger.info("Cover art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${tempImageFile.toURI()}")
+            }
+
+            return tempImageFile
         } catch (e: Exception) {
             logger.warn("Cover art [${ConsoleColors.red(mbid)}] failed to download: ${e.message}")
+            return null
         }
     }
 
