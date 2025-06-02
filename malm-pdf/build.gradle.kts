@@ -1,6 +1,11 @@
 plugins {
     id("com.excentric.kotlin-jvm")
     alias(libs.plugins.kotlinPluginSerialization)
+    application
+}
+
+application {
+    mainClass.set("com.excentric.utils.com.excentric.malm.pdf.PdfModifierKt")
 }
 
 dependencies {
