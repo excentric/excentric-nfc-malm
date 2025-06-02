@@ -1,11 +1,11 @@
-package com.excentric.service
+package com.excentric.malm.service
 
-import com.excentric.client.MusicBrainzApiClient
-import com.excentric.config.MusicBrainzProperties
-import com.excentric.model.api.AlbumReleaseGroupModel
-import com.excentric.model.api.AlbumReleaseModel
-import com.excentric.model.api.ArtistModel
-import com.excentric.model.api.MusicBrainzReleasesModel
+import com.excentric.malm.client.MusicBrainzApiClient
+import com.excentric.malm.config.MusicBrainzProperties
+import com.excentric.malm.model.AlbumReleaseGroupModel
+import com.excentric.malm.model.AlbumReleaseModel
+import com.excentric.malm.model.ArtistModel
+import com.excentric.malm.model.MusicBrainzReleasesModel
 import com.excentric.malm.metadata.AlbumMetadata
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

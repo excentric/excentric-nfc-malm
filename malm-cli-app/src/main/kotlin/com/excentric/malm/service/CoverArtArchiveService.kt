@@ -1,7 +1,7 @@
-package com.excentric.service
+package com.excentric.malm.service
 
-import com.excentric.client.CoverArtArchiveClient
-import com.excentric.storage.MetadataStorage
+import com.excentric.malm.client.CoverArtArchiveClient
+import com.excentric.malm.storage.MetadataStorage
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
@@ -18,7 +18,7 @@ class CoverArtArchiveService(
         if (albumMetadata == null) {
             logger.error("No metadata found for slot: $slot")
         } else {
-            coverArtArchiveClient.downloadAlbumArt(slot, albumMetadata.mbids)
+            coverArtArchiveClient.downloadCoverArt(slot, albumMetadata.mbids)
         }
     }
 }

@@ -1,11 +1,11 @@
-package com.excentric.client
+package com.excentric.malm.client
 
-import com.excentric.config.MusicBrainzProperties
-import com.excentric.errors.MalmException
-import com.excentric.model.api.MusicBrainzArtistsModel
-import com.excentric.model.api.MusicBrainzReleaseGroupsModel
-import com.excentric.model.api.MusicBrainzReleasesModel
-import com.excentric.model.api.MusicBrainzResultsModel
+import com.excentric.malm.config.MusicBrainzProperties
+import com.excentric.malm.errors.MalmException
+import com.excentric.malm.model.MusicBrainzArtistsModel
+import com.excentric.malm.model.MusicBrainzReleaseGroupsModel
+import com.excentric.malm.model.MusicBrainzReleasesModel
+import com.excentric.malm.model.MusicBrainzResultsModel
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod.GET

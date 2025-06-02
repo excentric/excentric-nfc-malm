@@ -1,8 +1,8 @@
-package com.excentric.storage
+package com.excentric.malm.storage
 
-import com.excentric.errors.MalmException
+import com.excentric.malm.errors.MalmException
 import com.excentric.malm.metadata.AlbumMetadata
-import com.excentric.util.ConsoleColors
+import com.excentric.malm.util.ConsoleColors
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -104,13 +104,13 @@ class MetadataStorage(
         logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
     }
 
-    fun saveAlbumArt(slot: Int, index: Int, mbid: String, albumArtResource: Resource) {
+    fun saveCoverArt(slot: Int, index: Int, mbid: String, albumArtResource: Resource) {
         val slotDir = File(metadataDirPath, "$slot").also { it.mkdirs() }
         val imageFile = File(slotDir, "${index.toString().padStart(2, '0')}.jpg")
 
         albumArtResource.inputStream.use { inputStream ->
             imageFile.writeBytes(inputStream.readAllBytes())
-            logger.info("Album art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${imageFile.toURI()}")
+            logger.info("Cover art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${imageFile.toURI()}")
         }
     }
 
@@ -133,7 +133,7 @@ class MetadataStorage(
     }
 
     fun selectAlbumArt(slot: Int, selectedFile: File) {
-        // SC: we will keep the potential album art for now i think
+        // SC: we will keep the potential cover art for now i think
         selectedFile.copyTo(File(metadataDirPath, "$slot.jpg"), overwrite = true)
         selectedFile.delete()
     }

@@ -1,6 +1,6 @@
-package com.excentric
+package com.excentric.malm
 
-import com.excentric.client.LoggingInterceptor
+import com.excentric.malm.client.ApiClientLoggingInterceptor
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.jline.utils.AttributedString
@@ -25,21 +25,21 @@ fun main(args: Array<String>) {
 
 @SpringBootApplication
 @CommandScan
-@ConfigurationPropertiesScan("com.excentric.config")
+@ConfigurationPropertiesScan("com.excentric.malm.config")
 open class MusicBrainzApplication {
     companion object {
         private val FIVE_SECONDS = ofSeconds(5L)
     }
 
     @Bean
-    open fun restTemplate(loggingInterceptor: LoggingInterceptor): RestTemplate {
+    open fun restTemplate(apiClientLoggingInterceptor: ApiClientLoggingInterceptor): RestTemplate {
         return RestTemplateBuilder()
             .setConnectTimeout(FIVE_SECONDS)
             .setReadTimeout(FIVE_SECONDS)
             .build().apply {
                 requestFactory = BufferingClientHttpRequestFactory(SimpleClientHttpRequestFactory())
                 messageConverters.add(0, MappingJackson2HttpMessageConverter())
-                interceptors.add(loggingInterceptor)
+                interceptors.add(apiClientLoggingInterceptor)
             }
     }
 

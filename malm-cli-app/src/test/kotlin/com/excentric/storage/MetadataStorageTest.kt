@@ -1,6 +1,7 @@
 package com.excentric.storage
 
 import com.excentric.malm.metadata.AlbumMetadata
+import com.excentric.malm.storage.MetadataStorage
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.junit.jupiter.api.AfterEach

@@ -1,8 +1,9 @@
 package com.excentric.storage
 
-import com.excentric.MusicBrainzApplication
+import com.excentric.malm.MusicBrainzApplication
 import com.excentric.malm.metadata.AlbumLabelMetadata
 import com.excentric.malm.pdf.PdfLabelWriter
+import com.excentric.malm.storage.MetadataStorage
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

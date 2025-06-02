@@ -1,9 +1,9 @@
-package com.excentric.client
+package com.excentric.malm.client
 
-import com.excentric.errors.MalmException
-import com.excentric.model.api.CoverArtResponseModel
-import com.excentric.storage.MetadataStorage
-import com.excentric.util.ConsoleColors
+import com.excentric.malm.errors.MalmException
+import com.excentric.malm.model.CoverArtResponseModel
+import com.excentric.malm.storage.MetadataStorage
+import com.excentric.malm.util.ConsoleColors
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
@@ -20,13 +20,13 @@ class CoverArtArchiveClient(
 ) : AbstractClient() {
     private val logger = LoggerFactory.getLogger(CoverArtArchiveClient::class.java)
 
-    fun downloadAlbumArt(slot: Int, mbids: List<String>) {
+    fun downloadCoverArt(slot: Int, mbids: List<String>) {
         mbids.forEachIndexed { index, mbid ->
-            downloadAlbumArt(slot, mbid, index)
+            downloadCoverArt(slot, mbid, index)
         }
     }
 
-    private fun downloadAlbumArt(slot: Int, mbid: String, index: Int) {
+    private fun downloadCoverArt(slot: Int, mbid: String, index: Int) {
         try {
             val response = restTemplate.exchange(
                 getImageMetadataApiUrl(mbid),
@@ -56,10 +56,10 @@ class CoverArtArchiveClient(
                 throw MalmException("Not an image")
             }
 
-            metadataStorage.saveAlbumArt(slot, index, mbid, imageResource)
+            metadataStorage.saveCoverArt(slot, index, mbid, imageResource)
 
         } catch (e: Exception) {
-            logger.warn("Album art [${ConsoleColors.red(mbid)}] failed to download: ${e.message}")
+            logger.warn("Cover art [${ConsoleColors.red(mbid)}] failed to download: ${e.message}")
         }
     }
 

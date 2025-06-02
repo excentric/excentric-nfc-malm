@@ -1,4 +1,4 @@
-package com.excentric.config
+package com.excentric.malm.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

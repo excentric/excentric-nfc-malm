@@ -1,6 +1,6 @@
-package com.excentric
+package com.excentric.malm.shell
 
-import com.excentric.errors.MalmException
+import com.excentric.malm.errors.MalmException
 import org.jline.terminal.Terminal
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Autowired

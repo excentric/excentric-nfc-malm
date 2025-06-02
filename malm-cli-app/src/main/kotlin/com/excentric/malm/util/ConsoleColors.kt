@@ -1,4 +1,4 @@
-package com.excentric.util
+package com.excentric.malm.util
 
 object ConsoleColors {
     private const val RESET = "\u001B[0m"
@@ -18,10 +18,10 @@ object ConsoleColors {
     }
 
     fun red(text: String): String {
-        return "${RED}${text}$RESET"
+        return "$RED${text}$RESET"
     }
 
     fun yellow(text: String): String {
-        return "${YELLOW}${text}$RESET"
+        return "$YELLOW${text}$RESET"
     }
 }

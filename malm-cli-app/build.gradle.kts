@@ -23,5 +23,5 @@ dependencies {
 }
 
 application {
-    mainClass = "com.excentric.MalmApplicationKt"
+    mainClass = "com.excentric.malm.MalmApplicationKt"
 }

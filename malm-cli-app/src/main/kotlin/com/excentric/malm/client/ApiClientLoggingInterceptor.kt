@@ -1,4 +1,4 @@
-package com.excentric.client
+package com.excentric.malm.client
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpRequest
@@ -11,8 +11,8 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
 @Component
-class LoggingInterceptor : ClientHttpRequestInterceptor {
-    private val log = LoggerFactory.getLogger(LoggingInterceptor::class.java)
+class ApiClientLoggingInterceptor : ClientHttpRequestInterceptor {
+    private val log = LoggerFactory.getLogger(ApiClientLoggingInterceptor::class.java)
 
     override fun intercept(
         request: HttpRequest,

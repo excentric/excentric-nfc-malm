@@ -1,4 +1,4 @@
-package com.excentric.model.api
+package com.excentric.malm.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable

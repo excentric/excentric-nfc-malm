@@ -1,11 +1,11 @@
-package com.excentric
+package com.excentric.malm.shell
 
 import com.excentric.malm.metadata.AlbumMetadata
-import com.excentric.service.MusicBrainzService
-import com.excentric.storage.MetadataStorage
-import com.excentric.util.ConsoleColors.green
-import com.excentric.util.ConsoleColors.greenOrRed
-import com.excentric.util.ConsoleColors.red
+import com.excentric.malm.service.MusicBrainzService
+import com.excentric.malm.storage.MetadataStorage
+import com.excentric.malm.util.ConsoleColors.green
+import com.excentric.malm.util.ConsoleColors.greenOrRed
+import com.excentric.malm.util.ConsoleColors.red
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.shell.component.context.ComponentContext

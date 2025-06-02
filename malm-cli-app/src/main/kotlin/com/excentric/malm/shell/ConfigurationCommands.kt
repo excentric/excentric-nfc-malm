@@ -1,6 +1,6 @@
-package com.excentric
+package com.excentric.malm.shell
 
-import com.excentric.config.MusicBrainzProperties
+import com.excentric.malm.config.MusicBrainzProperties
 import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
@@ -17,14 +17,14 @@ class ConfigurationCommands(
         exitProcess(0)
     }
 
-    @ShellMethod(key = ["more-aa"], value = "Set to only show album covers from release year")
-    fun moreAlbumArt() {
+    @ShellMethod(key = ["mb-find-more-ca"], value = "Set to only show album covers from release year")
+    fun moreCoverArt() {
         musicBrainzProperties.releaseYearCoversOnly = false
         logger.info("Set releaseYearCoversOnly to true - only showing album covers from release year")
     }
 
-    @ShellMethod(key = ["less-aa"], value = "Set to show all album covers, not just from release year")
-    fun lessAlbumArt() {
+    @ShellMethod(key = ["mb-find-less-ca"], value = "Set to show all album covers, not just from release year")
+    fun lessCoverArt() {
         musicBrainzProperties.releaseYearCoversOnly = true
         logger.info("Set releaseYearCoversOnly to false - showing all album covers")
     }

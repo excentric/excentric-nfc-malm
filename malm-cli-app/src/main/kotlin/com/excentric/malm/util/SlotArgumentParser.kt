@@ -1,6 +1,6 @@
-package com.excentric.util
+package com.excentric.malm.util
 
-import com.excentric.MalmShellCommands
+import com.excentric.malm.shell.MalmShellCommands
 import org.slf4j.LoggerFactory
 
 object SlotArgumentParser {

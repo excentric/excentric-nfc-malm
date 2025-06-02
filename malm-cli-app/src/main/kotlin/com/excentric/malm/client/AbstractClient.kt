@@ -1,4 +1,4 @@
-package com.excentric.client
+package com.excentric.malm.client
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
