@@ -15,7 +15,6 @@ import java.io.File
 import java.lang.Math.PI
 
 class PdfLabelWriter {
-
     companion object {
         const val LABEL_WIDTH = 132f
         const val ROTATE_90_ANTI_CLOCKWISE = PI / 2

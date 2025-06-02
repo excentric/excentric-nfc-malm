@@ -1,4 +1,6 @@
-package com.excentric.malm.pdf
+package com.excentric.malm
+
+import com.excentric.malm.pdf.PdfLabelWriter
 
 fun main() {
     PdfLabelWriter().apply {
