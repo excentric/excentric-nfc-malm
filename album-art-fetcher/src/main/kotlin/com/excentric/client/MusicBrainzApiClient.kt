@@ -35,11 +35,11 @@ class MusicBrainzApiClient(
     }
 
     fun searchReleaseGroupsByArtistId(artistId: String): MusicBrainzReleaseGroupsModel {
-        val searchUrl = buildReleaseGroupArtistIdSearchUrl(artistId)
+        val searchUrl = buildReleaseGroupArtistIdSearchUrl(artistId, 0)
 
         logger.info("Querying MusicBrainz API for release groups by artist ID: $searchUrl")
 
-        val responseModel = restTemplate.exchange(
+        val initialResponseModel = restTemplate.exchange(
             searchUrl,
             GET,
             HttpEntity<MusicBrainzReleaseGroupsModel>(buildRestHttpHeaders()),
@@ -47,8 +47,51 @@ class MusicBrainzApiClient(
             emptyMap<String, String>()
         ).body
 
-        validateModel(responseModel)
-        return responseModel!!
+        validateModel(initialResponseModel)
+
+        // Initialize with the first page results
+        var allReleaseGroups = initialResponseModel!!.releaseGroups.toMutableList()
+
+        // Continue fetching pages as long as we get exactly 100 results (the max per page)
+        var currentOffset = 100
+        var currentPageSize = initialResponseModel.results.size
+        val maxPages = 10 // Safety limit to prevent infinite loops
+        var pageCount = 1
+
+        while (currentPageSize == 100 && pageCount < maxPages) {
+            logger.info("Found 100 results on page $pageCount, fetching next page with offset $currentOffset")
+            val nextPageUrl = buildReleaseGroupArtistIdSearchUrl(artistId, currentOffset)
+
+            logger.info("Querying MusicBrainz API for next page of release groups: $nextPageUrl")
+
+            val nextPageResponseModel = restTemplate.exchange(
+                nextPageUrl,
+                GET,
+                HttpEntity<MusicBrainzReleaseGroupsModel>(buildRestHttpHeaders()),
+                MusicBrainzReleaseGroupsModel::class.java,
+                emptyMap<String, String>()
+            ).body
+
+            if (nextPageResponseModel != null && nextPageResponseModel.results.isNotEmpty()) {
+                // Add results from this page to our collection
+                allReleaseGroups.addAll(nextPageResponseModel.releaseGroups)
+                currentPageSize = nextPageResponseModel.results.size
+                currentOffset += 100
+                pageCount++
+
+                logger.info("Added ${nextPageResponseModel.results.size} results from page $pageCount, total results: ${allReleaseGroups.size}")
+            } else {
+                // No more results or error occurred
+                break
+            }
+        }
+
+        if (pageCount > 1) {
+            logger.info("Retrieved a total of ${allReleaseGroups.size} release groups across $pageCount pages")
+            return MusicBrainzReleaseGroupsModel(allReleaseGroups)
+        }
+
+        return initialResponseModel
     }
 
     fun searchArtists(artistName: String): MusicBrainzArtistsModel {
@@ -90,7 +133,7 @@ class MusicBrainzApiClient(
         return uriBuilder.build().toUriString()
     }
 
-    private fun buildReleaseGroupArtistIdSearchUrl(artistId: String): String {
+    private fun buildReleaseGroupArtistIdSearchUrl(artistId: String, offset: Int = 0): String {
         val searchQuery = "arid:$artistId AND (primarytype:Album OR primarytype:Album)"
 
         val uriBuilder = UriComponentsBuilder.fromUriString(musicBrainzProperties.api.url)
@@ -98,7 +141,7 @@ class MusicBrainzApiClient(
             .queryParam("fmt", "json")
             .queryParam("query", searchQuery)
             .queryParam("limit", 100)
-
+            .queryParam("offset", offset)
 
         return uriBuilder.build().toUriString()
     }
