@@ -7,16 +7,18 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":malm-pdf"))
+
     implementation(libs.springBootStarter)
     implementation(libs.springBootWeb)
     implementation(libs.springShell)
     implementation(libs.kotlinxSerialization)
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(libs.jacksonKotlin)
 
     // Testing dependencies
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+    testImplementation(libs.springBootTest)
+    testImplementation(libs.junitJupiterApi)
+    testRuntimeOnly(libs.junitJupiterEngine)
 }
 
 application {

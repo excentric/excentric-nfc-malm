@@ -11,6 +11,6 @@ plugins {
 }
 
 include(":album-art-fetcher")
-include(":avery-label-pdf-album-writer")
+include(":malm-pdf")
 
 rootProject.name = "excentric-nfc-sonos"

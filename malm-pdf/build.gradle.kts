@@ -4,6 +4,8 @@ plugins {
 }
 
 dependencies {
+    implementation("com.itextpdf:itext7-core:7.2.5")
+
     implementation(libs.bundles.kotlinxEcosystem)
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinTest)
 }
