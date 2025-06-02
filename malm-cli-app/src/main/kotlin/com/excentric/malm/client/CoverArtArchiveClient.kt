@@ -31,8 +31,10 @@ class CoverArtArchiveClient(
             val frontCover = coverArtResponse.images.find { it.front }
                 ?: throw MalmException("No front cover found for release $mbid")
 
+            val coverUrl = frontCover.thumbnails?.size1200 ?: frontCover.imageUrl
+
             val imageResponse = restTemplate.exchange(
-                frontCover.imageUrl,
+                coverUrl,
                 HttpMethod.GET,
                 HttpEntity<String>(buildImageHttpHeaders()),
                 Resource::class.java

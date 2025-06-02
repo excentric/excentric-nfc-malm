@@ -3,7 +3,6 @@ package com.excentric.malm.shell
 import com.excentric.malm.client.CoverArtArchiveClient
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.storage.MetadataStorage
-import com.excentric.malm.util.ConsoleColors.green
 import com.excentric.malm.util.SlotArgumentParser.parseSlotNumbers
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -36,7 +35,7 @@ class CoverArtCommands(
             val slotsMap = metadataStorage.getSlotsMap().filter { it.key in slotNumbers }
 
             val totalDownloads = slotsMap.flatMap { it.value.mbids }.size
-            var completedDownloads = 0
+            var completedAttempts = 0
 
             startProgressBar()
 
@@ -45,13 +44,14 @@ class CoverArtCommands(
                     coverArtArchiveClient.downloadCoverArt(mbid)?.let { coverArtFile ->
                         metadataStorage.saveCoverArt(slot, index, coverArtFile)
                     }
-                    completedDownloads++
-                    updateProgressBar(completedDownloads, totalDownloads)
+                    completedAttempts++
+                    updateProgressBar(completedAttempts, totalDownloads)
                 }
             }
             finishProgressBar()
 
-            logger.info("Downloaded $completedDownloads cover art images for ${slotsMap.keys.count()} slot(s)")
+            val totalDownloaded = slotsMap.keys.flatMap { metadataStorage.getPotentialCoverArtsFiles(it) }.size
+            logger.info("Downloaded $totalDownloaded cover art images for ${slotsMap.keys.count()} slot(s)")
         }
     }
 
