@@ -2,6 +2,7 @@ package com.excentric.client
 
 import com.excentric.config.MusicBrainzProperties
 import com.excentric.errors.MalmException
+import com.excentric.model.api.MusicBrainzArtistsModel
 import com.excentric.model.api.MusicBrainzReleaseGroupsModel
 import com.excentric.model.api.MusicBrainzReleasesModel
 import com.excentric.model.api.MusicBrainzResultsModel
@@ -50,6 +51,23 @@ class MusicBrainzApiClient(
         return responseModel!!
     }
 
+    fun searchArtists(artistName: String): MusicBrainzArtistsModel {
+        val searchUrl = buildArtistSearchUrl(artistName)
+
+        logger.info("Querying MusicBrainz API for artists by name: $searchUrl")
+
+        val responseModel = restTemplate.exchange(
+            searchUrl,
+            GET,
+            HttpEntity<MusicBrainzArtistsModel>(buildRestHttpHeaders()),
+            MusicBrainzArtistsModel::class.java,
+            emptyMap<String, String>()
+        ).body
+
+        validateModel(responseModel)
+        return responseModel!!
+    }
+
     private fun <T> validateModel(musicBrainzReleasesModel: MusicBrainzResultsModel<T>?) {
         val musicBrainzResponse = musicBrainzReleasesModel ?: throw MalmException("Empty response from MusicBrainz API")
 
@@ -81,6 +99,16 @@ class MusicBrainzApiClient(
             .queryParam("query", searchQuery)
             .queryParam("limit", 100)
 
+
+        return uriBuilder.build().toUriString()
+    }
+
+    private fun buildArtistSearchUrl(artistName: String): String {
+        val uriBuilder = UriComponentsBuilder.fromUriString(musicBrainzProperties.api.url)
+            .path("artist")
+            .queryParam("fmt", "json")
+            .queryParam("query", "artist:$artistName")
+            .queryParam("limit", 10)
 
         return uriBuilder.build().toUriString()
     }

@@ -125,5 +125,13 @@ data class ArtistCreditModel(
 @Serializable
 data class ArtistModel(
     val id: String,
-    val name: String
+    val name: String,
+    val score: Int? = null
 )
+
+data class MusicBrainzArtistsModel(
+    val artists: List<ArtistModel> = emptyList()
+) : MusicBrainzResultsModel<ArtistModel> {
+    override val results: List<ArtistModel>
+        get() = artists
+}
