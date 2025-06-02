@@ -1,8 +1,10 @@
 package com.excentric.malm.pdf
 
 import com.excentric.malm.metadata.AlbumLabelMetadata
+import com.excentric.malm.pdf.SlotPositionDetails.Companion.PARAGRAPH_OFFSET
 import com.itextpdf.io.font.constants.StandardFonts.HELVETICA_BOLD
 import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.font.PdfFont
 import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
@@ -12,6 +14,7 @@ import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.properties.TextAlignment.CENTER
+import com.itextpdf.layout.properties.VerticalAlignment.MIDDLE
 import java.io.File
 import java.lang.Math.PI
 
@@ -24,7 +27,7 @@ class PdfLabelWriter(
         const val DEFAULT_FONT_SIZE = 17f
     }
 
-    var paragraphBorder = false
+    var shouldAddTestParagraphBorder = false
 
     private val reader = PdfReader(javaClass.classLoader.getResourceAsStream("blank-avery.pdf"))
     private val writer = PdfWriter(File("output-hello-world.pdf"))
@@ -68,9 +71,10 @@ class PdfLabelWriter(
     private fun addLabel(label: AlbumLabelMetadata) {
         val slotPosition = slotPositionDetailsMap[label.slot]!!
 
-        val paragraphText = "${label.artist.orEmpty()}\n${label.title}\n${label.year.toString()}"
-
-        document.add(createParagraph(slotPosition, paragraphText))
+        val yearText = if (label.year == null) "" else "(${label.year})"
+        document.add(createParagraph(label.artist.orEmpty(), slotPosition.artistLeft, slotPosition.artistBottom))
+        document.add(createParagraph(label.title, slotPosition.titleLeft, slotPosition.titleBottom))
+        document.add(createParagraph(yearText, slotPosition.yearLeft, slotPosition.yearBottom))
         document.add(createImage(slotPosition, label.albumArt.absolutePath))
     }
 
@@ -83,17 +87,51 @@ class PdfLabelWriter(
         }
     }
 
-    private fun createParagraph(positionDetails: SlotPositionDetails, paragraphText: String): Paragraph {
+    private fun createParagraph(paragraphText: String, leftPosition: Float, bottomPosition: Float): Paragraph {
+        val font = PdfFontFactory.createFont(HELVETICA_BOLD)
+        val maxWidth = LABEL_WIDTH
+        val fontSize = calculateOptimalFontSize(paragraphText, font, maxWidth)
+
         return Paragraph(paragraphText).apply {
-            setFont(PdfFontFactory.createFont(HELVETICA_BOLD))
-            setFontSize(DEFAULT_FONT_SIZE)
+            setFont(font)
+            setHeight(PARAGRAPH_OFFSET)
+            setFontSize(fontSize)
             setTextAlignment(CENTER)
+            setVerticalAlignment(MIDDLE)
             setRotationAngle(ROTATE_90_ANTI_CLOCKWISE)
-            if (paragraphBorder) {
+            if (shouldAddTestParagraphBorder) {
+//                setBorder(SolidBorder(1f))
                 setBorderTop(SolidBorder(1f))
                 setBorderBottom(SolidBorder(1f))
             }
-            setFixedPosition(positionDetails.paragraphLeft, positionDetails.paragraphBottom, LABEL_WIDTH) // x, y, width (increased width for vertical text)
+            setFixedPosition(leftPosition, bottomPosition, LABEL_WIDTH) // x, y, width (increased width for vertical text)
         }
     }
+
+    private fun calculateOptimalFontSize(text: String, font: PdfFont, maxWidth: Float): Float {
+        var fontSize = DEFAULT_FONT_SIZE
+        val minFontSize = 6f // Minimum readable size
+        val maxFontSize = 17f // Maximum allowed size
+
+        // Start with default and adjust down if needed
+        while (fontSize > minFontSize) {
+            val textWidth = font.getWidth(text, fontSize)
+            if (textWidth <= maxWidth) {
+                break
+            }
+            fontSize -= 0.5f
+        }
+
+        // If we can go larger without exceeding width, do so
+        while (fontSize < maxFontSize) {
+            val textWidth = font.getWidth(text, fontSize + 0.5f)
+            if (textWidth > maxWidth) {
+                break
+            }
+            fontSize += 0.5f
+        }
+
+        return fontSize
+    }
+
 }
