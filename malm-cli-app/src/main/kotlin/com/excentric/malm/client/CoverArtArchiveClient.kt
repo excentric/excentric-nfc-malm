@@ -2,8 +2,6 @@ package com.excentric.malm.client
 
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.model.CoverArtResponseModel
-import com.excentric.malm.util.ConsoleColors
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
@@ -17,9 +15,7 @@ class CoverArtArchiveClient(
     @Value("\${music-album-label-maker.cover-art-archive.url}")
     private val coverArtArchiveApiUrl: String
 ) : AbstractClient() {
-    private val logger = LoggerFactory.getLogger(CoverArtArchiveClient::class.java)
-
-    fun downloadCoverArt(mbid: String) : File? {
+    fun downloadCoverArt(mbid: String): File? {
         try {
             val response = restTemplate.exchange(
                 getImageMetadataApiUrl(mbid),
@@ -49,18 +45,16 @@ class CoverArtArchiveClient(
                 throw MalmException("Not an image")
             }
 
-            val tempImageFile = File.createTempFile("", ".jpg").apply {
+            val tempImageFile = File.createTempFile("malm-cover-art", ".jpg").apply {
                 deleteOnExit()
             }
 
             imageResource.inputStream.use { inputStream ->
                 tempImageFile.writeBytes(inputStream.readAllBytes())
-                logger.info("Cover art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${tempImageFile.toURI()}")
             }
 
             return tempImageFile
         } catch (e: Exception) {
-            logger.warn("Cover art [${ConsoleColors.red(mbid)}] failed to download: ${e.message}")
             return null
         }
     }

@@ -14,7 +14,7 @@ abstract class AbstractShellCommands {
     private lateinit var resourceLoader: ResourceLoader
 
     @Autowired
-    private lateinit var terminal: Terminal
+    lateinit var terminal: Terminal
 
     @Autowired
     private lateinit var templateExecutor: TemplateExecutor
@@ -37,6 +37,7 @@ abstract class AbstractShellCommands {
             command()
         } catch (e: MalmException) {
             logger.error(e.message)
+            terminal.writer().flush()
         }
     }
 }

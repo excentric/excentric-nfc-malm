@@ -102,11 +102,9 @@ class MetadataStorage(
         logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
     }
 
-    fun saveCoverArt(slot: Int, coverArtFiles: List<File>) {
-        coverArtFiles.forEachIndexed { index, coverArtFile ->
-            val imageFile = getPotentialCoverArtFile(slot, index)
-            coverArtFile.copyTo(imageFile, overwrite = true)
-        }
+    fun saveCoverArt(slot: Int, index: Int, coverArtFile: File) {
+        val imageFile = getPotentialCoverArtFile(slot, index)
+        coverArtFile.copyTo(imageFile, overwrite = true)
     }
 
     fun getPotentialCoverArtsFiles(slot: Int): List<File> {

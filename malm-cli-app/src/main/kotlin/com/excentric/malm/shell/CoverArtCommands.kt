@@ -1,7 +1,7 @@
 package com.excentric.malm.shell
 
+import com.excentric.malm.client.CoverArtArchiveClient
 import com.excentric.malm.errors.MalmException
-import com.excentric.malm.service.CoverArtArchiveService
 import com.excentric.malm.storage.MetadataStorage
 import com.excentric.malm.util.SlotArgumentParser.parseSlotNumbers
 import org.slf4j.Logger
@@ -17,7 +17,7 @@ import java.util.Locale.getDefault
 
 @ShellComponent
 class CoverArtCommands(
-    private val coverArtArchiveService: CoverArtArchiveService,
+    private val coverArtArchiveClient: CoverArtArchiveClient,
     private val metadataStorage: MetadataStorage,
 ) : AbstractShellCommands() {
     override val logger: Logger = LoggerFactory.getLogger(CoverArtCommands::class.java)
@@ -32,9 +32,37 @@ class CoverArtCommands(
             else
                 parseSlotNumbers(slots)
 
-            slotNumbers.toSet().forEach { slot ->
-                coverArtArchiveService.downloadCoverArt(slot)
+            val slotsMap = metadataStorage.getSlotsMap().filter { it.key in slotNumbers }
+
+            terminal.writer().print("\r[                    ] 0%")
+            terminal.writer().flush()
+
+            val totalDownloads = slotsMap.flatMap { it.value.mbids }.size
+            var completedDownloads = 0
+
+            slotsMap.forEach { (slot, albumMetadata) ->
+                albumMetadata.mbids.forEachIndexed { index: Int, mbid: String ->
+                    coverArtArchiveClient.downloadCoverArt(mbid)?.let { coverArtFile ->
+                        metadataStorage.saveCoverArt(slot, index, coverArtFile)
+                    }
+                    completedDownloads++
+
+                    val percentage = completedDownloads * 100 / totalDownloads
+                    val progressBarWidth = 20
+                    val filledWidth = progressBarWidth * completedDownloads / totalDownloads
+
+                    val progressBar = "[" + "=".repeat(filledWidth) + " ".repeat(progressBarWidth - filledWidth) + "]"
+
+                    // Clear the line and print updated progress
+                    terminal.writer().print("\r$progressBar $percentage% [$completedDownloads / $totalDownloads]")
+                    terminal.writer().flush()
+                }
             }
+            // Print completion message
+            terminal.writer().println("\nCover art downloads complete")
+            terminal.writer().flush()
+
+            logger.info("Downloaded $completedDownloads cover art images for ${slotsMap.keys.count()} slot(s)")
         }
     }
 
