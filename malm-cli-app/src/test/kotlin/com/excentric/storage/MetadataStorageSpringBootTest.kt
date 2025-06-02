@@ -1,7 +1,7 @@
 package com.excentric.storage
 
 import com.excentric.malm.MusicBrainzApplication
-import com.excentric.malm.metadata.AlbumLabelMetadata
+import com.excentric.malm.metadata.LabelMetadata
 import com.excentric.malm.pdf.PdfLabelWriter
 import com.excentric.malm.storage.MetadataStorage
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ class MetadataStorageSpringBootTest {
         val pdfSlotsMap = slotsMap.filter { it.key in (1..10) }
 
         val labels = pdfSlotsMap.map { (slot, albumMetadata) ->
-            AlbumLabelMetadata(slot, albumMetadata.album, albumMetadata.artist, albumMetadata.year, metadataStorage.getAlbumArtFile(slot))
+            LabelMetadata(slot, albumMetadata.album, albumMetadata.artist, albumMetadata.year, metadataStorage.getCoverArtFile(slot))
         }
 
         PdfLabelWriter(labels).createPdf()

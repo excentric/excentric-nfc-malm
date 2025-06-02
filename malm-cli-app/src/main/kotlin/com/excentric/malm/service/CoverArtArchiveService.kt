@@ -12,7 +12,7 @@ class CoverArtArchiveService(
 ) {
     private val logger = LoggerFactory.getLogger(CoverArtArchiveService::class.java)
 
-    fun downloadAlbumArt(slot: Int) {
+    fun downloadCoverArt(slot: Int) {
         val slots = metadataStorage.getSlotsMap()
         val albumMetadata = slots[slot]
         if (albumMetadata == null) {

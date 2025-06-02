@@ -31,16 +31,19 @@ class MalmShellCommands(
             }
 
             slotsMap.forEach { (index, metadata) ->
-                val albumArtFile = metadataStorage.getAlbumArtFile(index)
-                val albumArtExists = if (albumArtFile.exists()) {
-                    green("Yes")
-                } else if (metadataStorage.getPotentialAlbumArtsFiles(index).isNotEmpty()) {
-                    yellow("Not Selected")
-                } else {
-                    red("No")
-                }
-                logger.info("Slot $index: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $albumArtExists")
+                val coverArtStatus = getCoverArtStatus(index)
+                logger.info("Slot $index: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $coverArtStatus")
             }
+        }
+    }
+
+    private fun getCoverArtStatus(index: Int): String {
+        return if (metadataStorage.getCoverArtFile(index).exists()) {
+            green("Yes")
+        } else if (metadataStorage.getPotentialCoverArtsFiles(index).isNotEmpty()) {
+            yellow("Not Selected")
+        } else {
+            red("No")
         }
     }
 

@@ -28,7 +28,7 @@ class CoverArtCommands(
     ) {
         doSafely {
             parseSlotNumbers(slots).forEach { slot ->
-                coverArtArchiveService.downloadAlbumArt(slot)
+                coverArtArchiveService.downloadCoverArt(slot)
             }
         }
     }
@@ -38,11 +38,11 @@ class CoverArtCommands(
         @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
         doSafely {
-            val albumArtFiles = metadataStorage.getPotentialAlbumArtsFiles(slot)
-            if (albumArtFiles.isEmpty())
+            val coverArtFiles = metadataStorage.getPotentialCoverArtsFiles(slot)
+            if (coverArtFiles.isEmpty())
                 throw MalmException("No cover art directory found for slot $slot")
 
-            val selectorItems = albumArtFiles.mapIndexed { index, file ->
+            val selectorItems = coverArtFiles.mapIndexed { index, file ->
                 val sizeInKB = file.length() / 1024
                 SelectorItem.of("${file.name} (${sizeInKB} KB)", file.name)
             }.toMutableList()
@@ -56,8 +56,8 @@ class CoverArtCommands(
                 return@doSafely
             }
 
-            albumArtFiles.find { it.name == context.resultItem.get().item }?.let { selectedFile ->
-                metadataStorage.selectAlbumArt(slot, selectedFile)
+            coverArtFiles.find { it.name == context.resultItem.get().item }?.let { selectedFile ->
+                metadataStorage.selectCoverArt(slot, selectedFile)
             }
         }
     }
@@ -66,17 +66,17 @@ class CoverArtCommands(
     fun openCoverArt(
         @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
-        val albumArtsUri = metadataStorage.getAlbumArtsDir(slot).toURI()
+        val coverArtsUri = metadataStorage.getCoverArtsDir(slot).toURI()
 
         val os = System.getProperty("os.name").lowercase(getDefault())
 
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(BROWSE)) {
-            Desktop.getDesktop().browse(albumArtsUri);
+            Desktop.getDesktop().browse(coverArtsUri);
         } else if (os.indexOf("mac") >= 0) {
             val rt = Runtime.getRuntime()
-            rt.exec("open $albumArtsUri")
+            rt.exec("open $coverArtsUri")
         } else {
-            logger.warn("Could not open cover art folder, browse here: $albumArtsUri")
+            logger.warn("Could not open cover art folder, browse here: $coverArtsUri")
         }
     }
 }

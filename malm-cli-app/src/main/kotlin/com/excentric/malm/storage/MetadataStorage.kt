@@ -104,22 +104,22 @@ class MetadataStorage(
         logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
     }
 
-    fun saveCoverArt(slot: Int, index: Int, mbid: String, albumArtResource: Resource) {
+    fun saveCoverArt(slot: Int, index: Int, mbid: String, coverArtResource: Resource) {
         val slotDir = File(metadataDirPath, "$slot").also { it.mkdirs() }
         val imageFile = File(slotDir, "${index.toString().padStart(2, '0')}.jpg")
 
-        albumArtResource.inputStream.use { inputStream ->
+        coverArtResource.inputStream.use { inputStream ->
             imageFile.writeBytes(inputStream.readAllBytes())
             logger.info("Cover art [${ConsoleColors.greenOrRed(mbid)}] downloaded successfully to: ${imageFile.toURI()}")
         }
     }
 
-    fun getAlbumArtsDir(slot: Int): File {
+    fun getCoverArtsDir(slot: Int): File {
         return File(metadataDirPath, "$slot")
     }
 
-    fun getPotentialAlbumArtsFiles(slot: Int): List<File> {
-        val slotDir = getAlbumArtsDir(slot)
+    fun getPotentialCoverArtsFiles(slot: Int): List<File> {
+        val slotDir = getCoverArtsDir(slot)
 
         if (slotDir.exists() && slotDir.isDirectory) {
             return slotDir.listFiles()?.filter { it.isFile && !it.name.startsWith(".") } ?: emptyList()
@@ -128,11 +128,11 @@ class MetadataStorage(
         return emptyList()
     }
 
-    fun getAlbumArtFile(slot: Int): File {
+    fun getCoverArtFile(slot: Int): File {
         return File(metadataDirPath, "$slot.jpg")
     }
 
-    fun selectAlbumArt(slot: Int, selectedFile: File) {
+    fun selectCoverArt(slot: Int, selectedFile: File) {
         // SC: we will keep the potential cover art for now i think
         selectedFile.copyTo(File(metadataDirPath, "$slot.jpg"), overwrite = true)
         selectedFile.delete()
@@ -155,12 +155,12 @@ class MetadataStorage(
             sourceJpgFile.delete()
         }
 
-        val sourceAlbumArtDir = File(metadataDirPath, "$sourceSlot")
-        if (sourceAlbumArtDir.exists() && sourceAlbumArtDir.isDirectory) {
+        val sourceCoverArtDir = File(metadataDirPath, "$sourceSlot")
+        if (sourceCoverArtDir.exists() && sourceCoverArtDir.isDirectory) {
             val targetAlbumDir = File(metadataDirPath, "$targetSlot")
             targetAlbumDir.deleteRecursively()
-            sourceAlbumArtDir.copyRecursively(targetAlbumDir)
-            sourceAlbumArtDir.deleteRecursively()
+            sourceCoverArtDir.copyRecursively(targetAlbumDir)
+            sourceCoverArtDir.deleteRecursively()
         }
 
         logger.info("Successfully moved slot $sourceSlot to slot $targetSlot")

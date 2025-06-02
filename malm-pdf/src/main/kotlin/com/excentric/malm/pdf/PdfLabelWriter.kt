@@ -1,6 +1,6 @@
 package com.excentric.malm.pdf
 
-import com.excentric.malm.metadata.AlbumLabelMetadata
+import com.excentric.malm.metadata.LabelMetadata
 import com.excentric.malm.pdf.SlotPositionDetails.Companion.PARAGRAPH_OFFSET
 import com.itextpdf.io.font.constants.StandardFonts.HELVETICA_BOLD
 import com.itextpdf.io.image.ImageDataFactory
@@ -19,7 +19,7 @@ import java.io.File
 import java.lang.Math.PI
 
 class PdfLabelWriter(
-    private val labels: List<AlbumLabelMetadata>,
+    private val labels: List<LabelMetadata>,
     private val pdfResourcePath: String = "Avery80x50-R-RectangleLabels-blank.pdf",
     private val shouldAddTestParagraphBorder: Boolean = false,
 ) {
@@ -70,14 +70,14 @@ class PdfLabelWriter(
         println("PDF successfully modified. Output saved to: ${File("output-hello-world.pdf").absolutePath}")
     }
 
-    private fun addLabel(label: AlbumLabelMetadata) {
+    private fun addLabel(label: LabelMetadata) {
         val slotPosition = slotPositionDetailsMap[label.slot]!!
 
         val yearText = if (label.year == null) "" else "(${label.year})"
         document.add(createParagraph(label.artist.orEmpty(), slotPosition.artistLeft, slotPosition.artistBottom))
         document.add(createParagraph(label.title, slotPosition.titleLeft, slotPosition.titleBottom))
         document.add(createParagraph(yearText, slotPosition.yearLeft, slotPosition.yearBottom))
-        document.add(createImage(slotPosition, label.albumArt.absolutePath))
+        document.add(createImage(slotPosition, label.coverArt.absolutePath))
     }
 
     private fun createImage(positionDetails: SlotPositionDetails, imagePath: String): Image {
