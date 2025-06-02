@@ -1,0 +1,6 @@
+spring:
+  shell:
+    history:
+      enabled: false
+    log:
+      enabled: false
