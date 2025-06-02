@@ -10,7 +10,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-include(":album-art-fetcher")
+include(":malm-cli-app")
 include(":malm-metadata")
 include(":malm-pdf")
 
