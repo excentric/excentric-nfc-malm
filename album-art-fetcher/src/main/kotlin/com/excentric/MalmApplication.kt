@@ -1,8 +1,8 @@
 package com.excentric
 
 import com.excentric.client.LoggingInterceptor
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.jline.utils.AttributedString
 import org.jline.utils.AttributedStyle
 import org.springframework.boot.SpringApplication
@@ -46,12 +46,11 @@ open class MusicBrainzApplication {
 
     @Bean
     open fun myPromptProvider(): PromptProvider {
-        return PromptProvider { AttributedString("my-shell:>", AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW)) }
+        return PromptProvider { AttributedString("malm:>", AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW)) }
     }
 
     @Bean
     @Primary
     open fun objectMapper(): ObjectMapper? =
-        ObjectMapper()
-            .configure(FAIL_ON_UNKNOWN_PROPERTIES, true)
+        jacksonObjectMapper()
 }

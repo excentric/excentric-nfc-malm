@@ -17,11 +17,11 @@ class MusicBrainzService(
 ) {
     private val logger = LoggerFactory.getLogger(MusicBrainzService::class.java)
 
-    fun searchReleaseGroupsByArtistId(artistId: String, includeSingles: Boolean): List<AlbumReleaseGroupModel> {
-        val releaseGroupResults = musicBrainzApiClient.searchReleaseGroupsByArtistId(artistId, includeSingles).releaseGroups
+    fun searchReleaseGroupsByArtistId(artistId: String): List<AlbumReleaseGroupModel> {
+        val releaseGroupResults = musicBrainzApiClient.searchReleaseGroupsByArtistId(artistId).releaseGroups
 
-        // Sort by release date
-        return releaseGroupResults.sortedBy { it.firstReleaseDate }
+        // Sort by release date; the newest first
+        return releaseGroupResults.sortedBy { it.firstReleaseDate }.reversed()
     }
 
     fun searchMusicBrainz(artistQuery: String, albumQuery: String): AlbumMetadata {

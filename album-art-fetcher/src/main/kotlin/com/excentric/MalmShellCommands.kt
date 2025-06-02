@@ -23,7 +23,7 @@ import java.awt.Desktop
 import java.awt.Desktop.Action.BROWSE
 import java.util.Locale.getDefault
 
-@ShellComponent("Main shell commands")
+@ShellComponent
 class MalmShellCommands(
     private val musicBrainzService: MusicBrainzService,
     private val coverArtArchiveService: CoverArtArchiveService,

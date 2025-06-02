@@ -6,7 +6,7 @@ import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import kotlin.system.exitProcess
 
-@ShellComponent("Configuration and other shell commands")
+@ShellComponent
 class ConfigurationCommands(
     private val musicBrainzProperties: MusicBrainzProperties,
 ) {

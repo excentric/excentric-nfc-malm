@@ -33,8 +33,8 @@ class MusicBrainzApiClient(
         return responseModel!!
     }
 
-    fun searchReleaseGroupsByArtistId(artistId: String, includeSingles: Boolean): MusicBrainzReleaseGroupsModel {
-        val searchUrl = buildReleaseGroupArtistIdSearchUrl(artistId, includeSingles)
+    fun searchReleaseGroupsByArtistId(artistId: String): MusicBrainzReleaseGroupsModel {
+        val searchUrl = buildReleaseGroupArtistIdSearchUrl(artistId)
 
         logger.info("Querying MusicBrainz API for release groups by artist ID: $searchUrl")
 
@@ -72,15 +72,15 @@ class MusicBrainzApiClient(
         return uriBuilder.build().toUriString()
     }
 
-    private fun buildReleaseGroupArtistIdSearchUrl(artistId: String, albumOnly: Boolean): String {
+    private fun buildReleaseGroupArtistIdSearchUrl(artistId: String): String {
+        val searchQuery = "arid:$artistId AND (primarytype:Album OR primarytype:Album)"
+
         val uriBuilder = UriComponentsBuilder.fromUriString(musicBrainzProperties.api.url)
             .path("release-group")
             .queryParam("fmt", "json")
-            .queryParam("query", "arid:$artistId")
+            .queryParam("query", searchQuery)
             .queryParam("limit", 100)
 
-        if(albumOnly)
-            uriBuilder.queryParam("primarytype", "Album")
 
         return uriBuilder.build().toUriString()
     }
