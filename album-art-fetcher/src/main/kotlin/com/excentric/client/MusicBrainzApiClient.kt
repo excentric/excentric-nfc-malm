@@ -46,6 +46,22 @@ class MusicBrainzApiClient(
         return validateModel(response.body)
     }
 
+    fun searchReleasesByArtistId(artistId: String): MusicBrainzResponseModel {
+        val searchUrl = buildArtistIdSearchUrl(artistId)
+
+        logger.info("Querying MusicBrainz API for releases by artist ID: $searchUrl")
+
+        val response = restTemplate.exchange(
+            searchUrl,
+            GET,
+            HttpEntity<MusicBrainzResponseModel>(buildRestHttpHeaders()),
+            MusicBrainzResponseModel::class.java,
+            emptyMap<String, String>()
+        )
+
+        return validateModel(response.body)
+    }
+
     private fun validateModel(musicBrainzResponseModel: MusicBrainzResponseModel?): MusicBrainzResponseModel {
         val musicBrainzResponse = musicBrainzResponseModel ?: throw MalmException("Empty response from MusicBrainz API")
 
@@ -74,6 +90,16 @@ class MusicBrainzApiClient(
             .path("release")
             .queryParam("fmt", "json")
             .queryParam("query", "artist:$artist")
+
+        return uriBuilder.build().toUriString()
+    }
+
+    private fun buildArtistIdSearchUrl(artistId: String): String {
+        val uriBuilder = UriComponentsBuilder.fromUriString(musicBrainzProperties.api.url)
+            .path("release")
+            .queryParam("fmt", "json")
+            .queryParam("query", "arid:$artistId")
+            .queryParam("limit", 100)
 
         return uriBuilder.build().toUriString()
     }

@@ -28,6 +28,18 @@ class MusicBrainzService(
         return uniqueAlbums.sortedBy { it.date }
     }
 
+    fun searchReleasesByArtistId(artistId: String): List<AlbumReleaseModel> {
+        val albumResults = musicBrainzApiClient.searchReleasesByArtistId(artistId)
+
+        // Filter for official releases and group by album title to avoid duplicates
+        val officialReleases = albumResults.releases.filter { it.status == "Official" }
+        val uniqueAlbums = officialReleases.groupBy { it.title }
+            .map { (_, releases) -> releases.first() }
+
+        // Sort by release date
+        return uniqueAlbums.sortedBy { it.date }
+    }
+
     fun searchMusicBrainz(artistQuery: String, albumQuery: String): AlbumMetadata {
         val albumResults = musicBrainzApiClient.searchAlbums(artistQuery, albumQuery)
         val firstResult = albumResults.releases.first()

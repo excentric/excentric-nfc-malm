@@ -46,7 +46,9 @@ data class AlbumReleaseModel(
 @Serializable
 data class ReleaseGroupModel(
     @JsonProperty("primary-type")
-    val primaryType: String,
+    val primaryType: String? = null,
+    @JsonProperty("secondary-types")
+    val secondaryTypes: List<String>? = null,
 )
 
 

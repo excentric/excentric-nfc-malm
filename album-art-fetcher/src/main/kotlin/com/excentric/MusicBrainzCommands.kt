@@ -38,9 +38,31 @@ class MusicBrainzCommands(
 
     @ShellMethod(key = ["mb-search-artist-id", "mbsaid"], value = "Search MusicBrainz by artist id")
     fun musicBrainzSearchByArtistId(
-        @ShellOption(help = "Search for albums by artist") artistId: String
+        @ShellOption(help = "Search for albums by artist") artistId: String,
+        @ShellOption(help = "Filter to show only albums", defaultValue = "true") albumOnly: Boolean
     ) {
         doSafely {
+            val releaseType = if (albumOnly) "albums" else "releases"
+            logger.info("Searching for $releaseType by artist ID: $artistId")
+            var releases = musicBrainzService.searchReleasesByArtistId(artistId)
+
+            if (albumOnly) {
+                releases = releases.filter { it.releaseGroupModel?.primaryType == "Album" && !it.releaseGroupModel.secondaryTypes.orEmpty().contains("Live") }
+                logger.info("Filtering to show only albums")
+            }
+
+            if (releases.isEmpty()) {
+                logger.info("No $releaseType found for artist ID: $artistId")
+                return@doSafely
+            }
+
+            logger.info("Found ${releases.size} $releaseType by artist ID $artistId:")
+            releases.forEachIndexed { index, release ->
+                val releaseDate = release.date ?: "Unknown date"
+                val releaseTitle = release.title
+                val artistName = release.getFirstArtistName() ?: "Unknown artist"
+                logger.info("${index + 1}. $releaseTitle by $artistName (${release.releaseGroupModel?.primaryType.orEmpty()}) ($releaseDate)")
+            }
         }
     }
 }
