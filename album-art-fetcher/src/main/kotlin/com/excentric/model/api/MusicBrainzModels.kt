@@ -31,9 +31,10 @@ data class AlbumReleaseModel(
     val score: Int? = null,
     @JsonProperty("artist-credit")
     val artistCredit: List<ArtistCreditModel> = emptyList(),
+    @JsonProperty("release-group")
+    val releaseGroupModel: ReleaseGroupModel? = null,
     val date: String? = null
 ) {
-
     fun getFirstArtistName() = artistCredit.firstOrNull()?.name
 
     fun getYear(): Int? {
@@ -41,6 +42,13 @@ data class AlbumReleaseModel(
         return date.substring(0, 4).toIntOrNull()
     }
 }
+
+@Serializable
+data class ReleaseGroupModel(
+    @JsonProperty("primary-type")
+    val primaryType: String,
+)
+
 
 @Serializable
 data class ArtistCreditModel(
