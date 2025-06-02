@@ -42,11 +42,6 @@ class MusicBrainzService(
         val year = albumResults.findEarliestReleaseYear(artist, album)
         val mbids = findReleasesForAlbumArt(albumResults, artist, album, year).map { it.id }
 
-        logger.info("IDs: ${greenOrRed(mbids)}")
-        logger.info("Album: ${greenOrRed(album)}")
-        logger.info("Artist: ${greenOrRed(artist)}")
-        logger.info("Year: ${greenOrRed(year)}")
-
         return AlbumMetadata(mbids, album, artist, year)
     }
 

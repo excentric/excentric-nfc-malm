@@ -43,8 +43,7 @@ data class AlbumReleaseGroupModel(
     val status: String? = null,
     @JsonProperty("artist-credit")
     val artistCredit: List<ArtistCreditModel> = emptyList(),
-    @JsonProperty("release-group")
-    val releases: AlbumReleaseModel? = null,
+    val releases: List<AlbumReleaseModel>? = null,
     val id: String,
     val title: String,
     val score: Int? = null,
@@ -55,8 +54,6 @@ data class AlbumReleaseGroupModel(
     @JsonProperty("secondary-types")
     val secondaryTypes: List<String>? = null,
 ) {
-    fun getFirstArtistName() = artistCredit.firstOrNull()?.name
-
     fun getYear(): Int? {
         if (firstReleaseDate.isNullOrBlank() || firstReleaseDate.length < 4) return null
         return firstReleaseDate.substring(0, 4).toIntOrNull()

@@ -2,23 +2,19 @@ package com.excentric
 
 import com.excentric.errors.MalmException
 import com.excentric.service.CoverArtArchiveService
-import com.excentric.service.MusicBrainzService
 import com.excentric.storage.MetadataStorage
 import com.excentric.util.ConsoleColors.green
 import com.excentric.util.ConsoleColors.greenOrRed
 import com.excentric.util.ConsoleColors.red
 import com.excentric.util.ConsoleColors.yellow
 import com.excentric.util.SlotArgumentParser.parseSlotNumbers
-import org.jline.terminal.Terminal
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.ResourceLoader
-import org.springframework.shell.component.SingleItemSelector
 import org.springframework.shell.component.context.ComponentContext
 import org.springframework.shell.component.support.SelectorItem
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
-import org.springframework.shell.style.TemplateExecutor
 import java.awt.Desktop
 import java.awt.Desktop.Action.BROWSE
 import java.util.Locale.getDefault
@@ -27,11 +23,8 @@ import java.util.Locale.getDefault
 class MalmShellCommands(
     private val coverArtArchiveService: CoverArtArchiveService,
     private val metadataStorage: MetadataStorage,
-    private val resourceLoader: ResourceLoader,
-    private val terminal: Terminal,
-    private val templateExecutor: TemplateExecutor,
-) {
-    private val logger = LoggerFactory.getLogger(MalmShellCommands::class.java)
+) : AbstractShellCommands() {
+    override val logger: Logger = LoggerFactory.getLogger(MalmShellCommands::class.java)
 
     @ShellMethod(key = ["save-to-slot", "s"], value = "Save current album metadata to a numbered slot (1-99)")
     fun saveToSlot(
@@ -145,25 +138,6 @@ class MalmShellCommands(
         doSafely {
             metadataStorage.moveSlot(sourceSlot, targetSlot)
             logger.info("Moved slot $sourceSlot to slot $targetSlot")
-        }
-    }
-
-    private fun createSingleItemSelector(
-        selectorItems: MutableList<SelectorItem<String>>,
-        message: String
-    ): SingleItemSelector<String, SelectorItem<String>> {
-        return SingleItemSelector(terminal, selectorItems, message, null).apply {
-            setResourceLoader(resourceLoader)
-            this.templateExecutor = this@MalmShellCommands.templateExecutor
-            setMaxItems(20)
-        }
-    }
-
-    private fun doSafely(command: () -> Unit) {
-        try {
-            command()
-        } catch (e: MalmException) {
-            logger.error(e.message)
         }
     }
 }
