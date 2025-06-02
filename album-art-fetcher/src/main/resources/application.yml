@@ -4,6 +4,14 @@ spring:
   shell:
     noninteractive.enabled: false
 
+#logging:
+#  level:
+#    com.excentric.client.LoggingInterceptor: DEBUG
+#  file:
+#    name: logs/rest-client.log
+#  pattern:
+#    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
 music-album-label-maker:
   api.user-agent: "MusicAlbumLabelMaker/0.0.1 (nfc-sonos@excentric.com)"
   musicbrainz:
@@ -11,4 +19,3 @@ music-album-label-maker:
     release-year-covers-only: true
   cover-art-archive.url: https://coverartarchive.org/
   metadata-directory: ${user.home}/.album-metadata
-

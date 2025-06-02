@@ -1,7 +1,8 @@
 package com.excentric
 
+import com.excentric.client.LoggingInterceptor
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.jline.utils.AttributedString
 import org.jline.utils.AttributedStyle
 import org.springframework.boot.SpringApplication
@@ -9,6 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
+import org.springframework.http.client.BufferingClientHttpRequestFactory
+import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.shell.command.annotation.CommandScan
 import org.springframework.shell.jline.PromptProvider
@@ -29,12 +33,14 @@ open class MusicBrainzApplication {
     }
 
     @Bean
-    open fun restTemplate(): RestTemplate {
+    open fun restTemplate(loggingInterceptor: LoggingInterceptor): RestTemplate {
         return RestTemplateBuilder()
             .setConnectTimeout(FIVE_SECONDS)
             .setReadTimeout(FIVE_SECONDS)
             .build().apply {
+                requestFactory = BufferingClientHttpRequestFactory(SimpleClientHttpRequestFactory())
                 messageConverters.add(0, MappingJackson2HttpMessageConverter())
+                interceptors.add(loggingInterceptor)
             }
     }
 
@@ -44,7 +50,8 @@ open class MusicBrainzApplication {
     }
 
     @Bean
-    open fun objectMapper(): ObjectMapper {
-        return jacksonObjectMapper()
-    }
+    @Primary
+    open fun objectMapper(): ObjectMapper? =
+        ObjectMapper()
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, true)
 }

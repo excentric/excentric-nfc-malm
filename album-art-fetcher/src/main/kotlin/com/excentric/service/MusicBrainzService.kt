@@ -2,8 +2,9 @@ package com.excentric.service
 
 import com.excentric.client.MusicBrainzApiClient
 import com.excentric.config.MusicBrainzProperties
+import com.excentric.model.api.AlbumReleaseGroupModel
 import com.excentric.model.api.AlbumReleaseModel
-import com.excentric.model.api.MusicBrainzResponseModel
+import com.excentric.model.api.MusicBrainzReleasesModel
 import com.excentric.model.storage.AlbumMetadata
 import com.excentric.util.ConsoleColors.greenOrRed
 import org.slf4j.LoggerFactory
@@ -16,28 +17,11 @@ class MusicBrainzService(
 ) {
     private val logger = LoggerFactory.getLogger(MusicBrainzService::class.java)
 
-    fun searchArtistAlbums(artistQuery: String): List<AlbumReleaseModel> {
-        val albumResults = musicBrainzApiClient.searchArtistAlbums(artistQuery)
-
-        // Filter for official releases and group by album title to avoid duplicates
-        val officialReleases = albumResults.releases.filter { it.status == "Official" }
-        val uniqueAlbums = officialReleases.groupBy { it.title }
-            .map { (_, releases) -> releases.first() }
+    fun searchReleaseGroupsByArtistId(artistId: String, includeSingles: Boolean): List<AlbumReleaseGroupModel> {
+        val releaseGroupResults = musicBrainzApiClient.searchReleaseGroupsByArtistId(artistId, includeSingles).releaseGroups
 
         // Sort by release date
-        return uniqueAlbums.sortedBy { it.date }
-    }
-
-    fun searchReleasesByArtistId(artistId: String): List<AlbumReleaseModel> {
-        val albumResults = musicBrainzApiClient.searchReleasesByArtistId(artistId)
-
-        // Filter for official releases and group by album title to avoid duplicates
-        val officialReleases = albumResults.releases.filter { it.status == "Official" }
-        val uniqueAlbums = officialReleases.groupBy { it.title }
-            .map { (_, releases) -> releases.first() }
-
-        // Sort by release date
-        return uniqueAlbums.sortedBy { it.date }
+        return releaseGroupResults.sortedBy { it.firstReleaseDate }
     }
 
     fun searchMusicBrainz(artistQuery: String, albumQuery: String): AlbumMetadata {
@@ -57,7 +41,7 @@ class MusicBrainzService(
         return AlbumMetadata(mbids, album, artist, year)
     }
 
-    private fun findReleasesForAlbumArt(albumResults: MusicBrainzResponseModel, artist: String?, album: String, year: Int?): List<AlbumReleaseModel> {
+    private fun findReleasesForAlbumArt(albumResults: MusicBrainzReleasesModel, artist: String?, album: String, year: Int?): List<AlbumReleaseModel> {
         val matchingReleases = albumResults.findReleasesByAlbumAndArtist(album, artist)
         val officialSortedReleases = matchingReleases.filter { it.status == "Official" }.sortedBy { it.date }
 

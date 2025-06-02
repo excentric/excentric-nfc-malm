@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MusicBrainzResponseModel(
+data class MusicBrainzReleasesModel(
     val releases: List<AlbumReleaseModel> = emptyList()
-) {
+) : MusicBrainzResultsModel<AlbumReleaseModel> {
+    override val results: List<AlbumReleaseModel>
+        get() = releases
+
     fun findEarliestReleaseYear(artistName: String?, albumName: String): Int? {
         val matchingReleases = findReleasesByAlbumAndArtist(albumName, artistName)
         val sortedReleases = matchingReleases.filter { it.getYear() != null }.sortedBy { it.getYear() }
@@ -23,6 +26,43 @@ data class MusicBrainzResponseModel(
     }
 }
 
+interface MusicBrainzResultsModel<T> {
+    val results: List<T>
+}
+
+data class MusicBrainzReleaseGroupsModel(
+    @JsonProperty("release-groups")
+    val releaseGroups: List<AlbumReleaseGroupModel> = emptyList()
+) : MusicBrainzResultsModel<AlbumReleaseGroupModel> {
+    override val results: List<AlbumReleaseGroupModel>
+        get() = releaseGroups
+}
+
+@Serializable
+data class AlbumReleaseGroupModel(
+    val status: String? = null,
+    @JsonProperty("artist-credit")
+    val artistCredit: List<ArtistCreditModel> = emptyList(),
+    @JsonProperty("release-group")
+    val releases: AlbumReleaseModel? = null,
+    val id: String,
+    val title: String,
+    val score: Int? = null,
+    @JsonProperty("first-release-date")
+    val firstReleaseDate: String? = null,
+    @JsonProperty("primary-type")
+    val primaryType: String? = null,
+    @JsonProperty("secondary-types")
+    val secondaryTypes: List<String>? = null,
+) {
+    fun getFirstArtistName() = artistCredit.firstOrNull()?.name
+
+    fun getYear(): Int? {
+        if (firstReleaseDate.isNullOrBlank() || firstReleaseDate.length < 4) return null
+        return firstReleaseDate.substring(0, 4).toIntOrNull()
+    }
+}
+
 @Serializable
 data class AlbumReleaseModel(
     val id: String,
@@ -32,7 +72,7 @@ data class AlbumReleaseModel(
     @JsonProperty("artist-credit")
     val artistCredit: List<ArtistCreditModel> = emptyList(),
     @JsonProperty("release-group")
-    val releaseGroupModel: ReleaseGroupModel? = null,
+    val releaseGroupModel: AlbumReleaseGroupModel? = null,
     val date: String? = null
 ) {
     fun getFirstArtistName() = artistCredit.firstOrNull()?.name
@@ -43,13 +83,37 @@ data class AlbumReleaseModel(
     }
 }
 
-@Serializable
-data class ReleaseGroupModel(
-    @JsonProperty("primary-type")
-    val primaryType: String? = null,
-    @JsonProperty("secondary-types")
-    val secondaryTypes: List<String>? = null,
-)
+enum class ReleaseGroupPrimaryType(val value: String) {
+    ALBUM("Album"),
+    SINGLE("Single"),
+    EP("EP"),
+    BROADCAST("Broadcast"),
+    OTHER("Other"),
+    ;
+
+    override fun toString(): String {
+        return value
+    }
+}
+
+enum class ReleaseGroupSecondaryType(val value: String) {
+    COMPILATION("Compilation"),
+    SOUNDTRACK("Soundtrack"),
+    SPOKENWORD("Spokenword"),
+    INTERVIEW("Interview"),
+    AUDIO_DRAMA("Audio drama"),
+    LIVE("Live"),
+    REMIX("Remix"),
+    DJ_MIX("DJ-mix"),
+    MIXTAPE_STREET("Mixtape/Street"),
+    DEMO("Demo"),
+    FIELD_RECORDING("Field recording")
+    ;
+
+    override fun toString(): String {
+        return value
+    }
+}
 
 
 @Serializable

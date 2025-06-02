@@ -14,54 +14,28 @@ class MusicBrainzCommands(
 
     override val logger: Logger = LoggerFactory.getLogger(MusicBrainzCommands::class.java)
 
-    @ShellMethod(key = ["mb-search", "mbs"], value = "Search MusicBrainz for artists albums")
-    fun musicBrainzSearch(
-        @ShellOption(help = "Search for albums by artist") artist: String
-    ) {
-        doSafely {
-            logger.info("Searching for albums by artist: $artist")
-            val albums = musicBrainzService.searchArtistAlbums(artist)
-
-            if (albums.isEmpty()) {
-                logger.info("No albums found for artist: $artist")
-                return@doSafely
-            }
-
-            logger.info("Found ${albums.size} albums by $artist:")
-            albums.forEachIndexed { index, album ->
-                val releaseDate = album.date ?: "Unknown date"
-                val albumTitle = album.title
-                logger.info("${index + 1}. $albumTitle (${album.releaseGroupModel?.primaryType.orEmpty()}) ($releaseDate)")
-            }
-        }
-    }
-
     @ShellMethod(key = ["mb-search-artist-id", "mbsaid"], value = "Search MusicBrainz by artist id")
     fun musicBrainzSearchByArtistId(
         @ShellOption(help = "Search for albums by artist") artistId: String,
-        @ShellOption(help = "Filter to show only albums", defaultValue = "true") albumOnly: Boolean
+        @ShellOption(help = "Filter to show only albums", defaultValue = "false") includeSingles: Boolean
     ) {
         doSafely {
-            val releaseType = if (albumOnly) "albums" else "releases"
-            logger.info("Searching for $releaseType by artist ID: $artistId")
-            var releases = musicBrainzService.searchReleasesByArtistId(artistId)
+            val releaseGroups = musicBrainzService.searchReleaseGroupsByArtistId(artistId, includeSingles)
 
-            if (albumOnly) {
-                releases = releases.filter { it.releaseGroupModel?.primaryType == "Album" && !it.releaseGroupModel.secondaryTypes.orEmpty().contains("Live") }
-                logger.info("Filtering to show only albums")
-            }
-
-            if (releases.isEmpty()) {
-                logger.info("No $releaseType found for artist ID: $artistId")
+            if (releaseGroups.isEmpty()) {
+                logger.info("Nothing found for artist ID: $artistId")
                 return@doSafely
             }
 
-            logger.info("Found ${releases.size} $releaseType by artist ID $artistId:")
-            releases.forEachIndexed { index, release ->
-                val releaseDate = release.date ?: "Unknown date"
-                val releaseTitle = release.title
-                val artistName = release.getFirstArtistName() ?: "Unknown artist"
-                logger.info("${index + 1}. $releaseTitle by $artistName (${release.releaseGroupModel?.primaryType.orEmpty()}) ($releaseDate)")
+            logger.info("Found ${releaseGroups.size} release groups by artist ID $artistId:")
+
+            releaseGroups.forEachIndexed { index, releaseGroup ->
+                val releaseDate = releaseGroup.firstReleaseDate ?: "Unknown date"
+                val releaseTitle = releaseGroup.title
+                val artistName = releaseGroup.getFirstArtistName() ?: "Unknown artist"
+                val secondaryTypes = releaseGroup.secondaryTypes?.joinToString(", ").orEmpty()
+                val primaryType = releaseGroup.primaryType
+                logger.info("${index + 1}. $releaseTitle by $artistName ($primaryType:$secondaryTypes}) ($releaseDate)")
             }
         }
     }

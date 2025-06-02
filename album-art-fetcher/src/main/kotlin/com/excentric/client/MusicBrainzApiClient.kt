@@ -2,7 +2,9 @@ package com.excentric.client
 
 import com.excentric.config.MusicBrainzProperties
 import com.excentric.errors.MalmException
-import com.excentric.model.api.MusicBrainzResponseModel
+import com.excentric.model.api.MusicBrainzReleaseGroupsModel
+import com.excentric.model.api.MusicBrainzReleasesModel
+import com.excentric.model.api.MusicBrainzResultsModel
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod.GET
@@ -15,60 +17,45 @@ class MusicBrainzApiClient(
 ) : AbstractClient() {
     private val logger = LoggerFactory.getLogger(MusicBrainzApiClient::class.java)
 
-    fun searchAlbums(artist: String, album: String): MusicBrainzResponseModel {
+    fun searchAlbums(artist: String, album: String): MusicBrainzReleasesModel {
         val searchUrl = buildSearchUrl(artist, album)
 
         logger.info("Querying MusicBrainz API: $searchUrl")
 
-        val response = restTemplate.exchange(
+        val responseModel = restTemplate.exchange(
             searchUrl,
             GET,
-            HttpEntity<MusicBrainzResponseModel>(buildRestHttpHeaders()),
-            MusicBrainzResponseModel::class.java
-        )
+            HttpEntity<MusicBrainzReleasesModel>(buildRestHttpHeaders()),
+            MusicBrainzReleasesModel::class.java
+        ).body
 
-        return validateModel(response.body)
+        validateModel(responseModel)
+        return responseModel!!
     }
 
-    fun searchArtistAlbums(artist: String): MusicBrainzResponseModel {
-        val searchUrl = buildArtistSearchUrl(artist)
+    fun searchReleaseGroupsByArtistId(artistId: String, includeSingles: Boolean): MusicBrainzReleaseGroupsModel {
+        val searchUrl = buildReleaseGroupArtistIdSearchUrl(artistId, includeSingles)
 
-        logger.info("Querying MusicBrainz API for artist albums: $searchUrl")
+        logger.info("Querying MusicBrainz API for release groups by artist ID: $searchUrl")
 
-        val response = restTemplate.exchange(
+        val responseModel = restTemplate.exchange(
             searchUrl,
             GET,
-            HttpEntity<MusicBrainzResponseModel>(buildRestHttpHeaders()),
-            MusicBrainzResponseModel::class.java,
+            HttpEntity<MusicBrainzReleaseGroupsModel>(buildRestHttpHeaders()),
+            MusicBrainzReleaseGroupsModel::class.java,
             emptyMap<String, String>()
-        )
+        ).body
 
-        return validateModel(response.body)
+        validateModel(responseModel)
+        return responseModel!!
     }
 
-    fun searchReleasesByArtistId(artistId: String): MusicBrainzResponseModel {
-        val searchUrl = buildArtistIdSearchUrl(artistId)
+    private fun <T> validateModel(musicBrainzReleasesModel: MusicBrainzResultsModel<T>?) {
+        val musicBrainzResponse = musicBrainzReleasesModel ?: throw MalmException("Empty response from MusicBrainz API")
 
-        logger.info("Querying MusicBrainz API for releases by artist ID: $searchUrl")
-
-        val response = restTemplate.exchange(
-            searchUrl,
-            GET,
-            HttpEntity<MusicBrainzResponseModel>(buildRestHttpHeaders()),
-            MusicBrainzResponseModel::class.java,
-            emptyMap<String, String>()
-        )
-
-        return validateModel(response.body)
-    }
-
-    private fun validateModel(musicBrainzResponseModel: MusicBrainzResponseModel?): MusicBrainzResponseModel {
-        val musicBrainzResponse = musicBrainzResponseModel ?: throw MalmException("Empty response from MusicBrainz API")
-
-        if (musicBrainzResponse.releases.isEmpty()) {
+        if (musicBrainzResponse.results.isEmpty()) {
             throw MalmException("No releases found in the response")
         }
-        return musicBrainzResponse
     }
 
     private fun buildSearchUrl(artist: String, album: String): String {
@@ -85,21 +72,15 @@ class MusicBrainzApiClient(
         return uriBuilder.build().toUriString()
     }
 
-    private fun buildArtistSearchUrl(artist: String): String {
+    private fun buildReleaseGroupArtistIdSearchUrl(artistId: String, albumOnly: Boolean): String {
         val uriBuilder = UriComponentsBuilder.fromUriString(musicBrainzProperties.api.url)
-            .path("release")
-            .queryParam("fmt", "json")
-            .queryParam("query", "artist:$artist")
-
-        return uriBuilder.build().toUriString()
-    }
-
-    private fun buildArtistIdSearchUrl(artistId: String): String {
-        val uriBuilder = UriComponentsBuilder.fromUriString(musicBrainzProperties.api.url)
-            .path("release")
+            .path("release-group")
             .queryParam("fmt", "json")
             .queryParam("query", "arid:$artistId")
             .queryParam("limit", 100)
+
+        if(albumOnly)
+            uriBuilder.queryParam("primarytype", "Album")
 
         return uriBuilder.build().toUriString()
     }
