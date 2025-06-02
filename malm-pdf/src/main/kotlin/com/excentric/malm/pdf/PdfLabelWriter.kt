@@ -19,7 +19,9 @@ import java.io.File
 import java.lang.Math.PI
 
 class PdfLabelWriter(
-    private val labels: List<AlbumLabelMetadata>
+    private val labels: List<AlbumLabelMetadata>,
+    private val shouldAddTestParagraphBorder: Boolean = false,
+    private val writeOverExistingPdfResource: Boolean = false,
 ) {
     companion object {
         const val LABEL_WIDTH = 132f
@@ -27,9 +29,7 @@ class PdfLabelWriter(
         const val DEFAULT_FONT_SIZE = 17f
     }
 
-    var shouldAddTestParagraphBorder = false
 
-    private val reader = PdfReader(javaClass.classLoader.getResourceAsStream("blank-avery.pdf"))
     private val writer = PdfWriter(File("output-hello-world.pdf"))
 
     private lateinit var document: Document
@@ -49,15 +49,20 @@ class PdfLabelWriter(
 
     fun createPdf() {
         try {
-            run()
+            createPdfThrowingException()
         } catch (e: Exception) {
             println("Error modifying PDF: ${e.message}")
             e.printStackTrace()
         }
     }
 
-    private fun run() {
-        document = Document(PdfDocument(reader, writer))
+    private fun createPdfThrowingException() {
+        if (writeOverExistingPdfResource) {
+            val reader = PdfReader(javaClass.classLoader.getResourceAsStream("Avery80x50-R-RectangleLabels-red.pdf"))
+            document = Document(PdfDocument(reader, writer))
+        } else {
+            document = Document(PdfDocument(writer))
+        }
 
         labels.forEach { label ->
             addLabel(label)

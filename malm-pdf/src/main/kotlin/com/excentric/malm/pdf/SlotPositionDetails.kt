@@ -17,9 +17,9 @@ class SlotPositionDetails(row: Int, column: Int) {
         const val PARAGRAPH_OFFSET = 26f
 
         const val ORIGIN_IMAGE_LEFT = 58f
-        const val ORIGIN_IMAGE_BOTTOM = 670f
+        const val ORIGIN_IMAGE_BOTTOM = 667f
         const val ORIGIN_ARTIST_LEFT = 225f
-        const val ORIGIN_PARAGRAPH_BOTTOM = 675f
+        const val ORIGIN_PARAGRAPH_BOTTOM = 670f
         const val ORIGIN_TITLE_LEFT = ORIGIN_ARTIST_LEFT + PARAGRAPH_OFFSET
         const val ORIGIN_YEAR_LEFT = ORIGIN_TITLE_LEFT + PARAGRAPH_OFFSET
     }
