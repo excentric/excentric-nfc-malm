@@ -32,8 +32,8 @@ class MetadataStorage(
 
         validate(slot, metadata)
 
-        val metadataFile = File(metadataDirPath, "$slot.json")
         return try {
+            val metadataFile = getMetadataFile(slot)
             objectMapper.writeValue(metadataFile, metadata)
             logger.info("Successfully saved album metadata to slot $slot")
         } catch (e: Exception) {
@@ -95,18 +95,17 @@ class MetadataStorage(
         validateMetadataDir()
         val originalFileCount = metadataDir.listFiles()?.size ?: 0
         slotNumbers.forEach { slot ->
-            File(metadataDirPath, "$slot.json").delete()
-            File(metadataDirPath, "$slot.jpg").delete()
-            File(metadataDirPath, "$slot").deleteRecursively()
+            getMetadataFile(slot).delete()
+            getSelectedCoverArtFile(slot).delete()
+            getPotentialCoverArtFilesDir(slot).deleteRecursively()
         }
 
         val newFileCount = metadataDir.listFiles()?.size ?: 0
         logger.info("Removed ${originalFileCount - newFileCount} metadata files. $newFileCount files remain.")
     }
 
-    fun saveCoverArt(slot: Int, index: Int, mbid: String, coverArtResource: Resource) {
-        val slotDir = File(metadataDirPath, "$slot").also { it.mkdirs() }
-        val imageFile = File(slotDir, "${index.toString().padStart(2, '0')}.jpg")
+    fun saveCoverArt(slot: Int, potentialCoverArtIndex: Int, mbid: String, coverArtResource: Resource) {
+        val imageFile = getPotentialCoverArtFile(slot, potentialCoverArtIndex)
 
         coverArtResource.inputStream.use { inputStream ->
             imageFile.writeBytes(inputStream.readAllBytes())
@@ -114,12 +113,8 @@ class MetadataStorage(
         }
     }
 
-    fun getCoverArtsDir(slot: Int): File {
-        return File(metadataDirPath, "$slot")
-    }
-
     fun getPotentialCoverArtsFiles(slot: Int): List<File> {
-        val slotDir = getCoverArtsDir(slot)
+        val slotDir = getPotentialCoverArtFilesDir(slot)
 
         if (slotDir.exists() && slotDir.isDirectory) {
             return slotDir.listFiles()?.filter { it.isFile && !it.name.startsWith(".") } ?: emptyList()
@@ -129,12 +124,12 @@ class MetadataStorage(
     }
 
     fun getCoverArtFile(slot: Int): File {
-        return File(metadataDirPath, "$slot.jpg")
+        return getSelectedCoverArtFile(slot)
     }
 
     fun selectCoverArt(slot: Int, selectedFile: File) {
         // SC: we will keep the potential cover art for now i think
-        selectedFile.copyTo(File(metadataDirPath, "$slot.jpg"), overwrite = true)
+        selectedFile.copyTo(getSelectedCoverArtFile(slot), overwrite = true)
         selectedFile.delete()
     }
 
@@ -145,24 +140,47 @@ class MetadataStorage(
 
         validateMetadataDir()
 
-        val sourceJsonFile = File(metadataDirPath, "$sourceSlot.json")
-        sourceJsonFile.copyTo(File(metadataDirPath, "$targetSlot.json"), true)
+        val sourceJsonFile = getMetadataFile(sourceSlot)
+        sourceJsonFile.copyTo(getMetadataFile(targetSlot), true)
         sourceJsonFile.delete()
 
-        val sourceJpgFile = File(metadataDirPath, "$sourceSlot.jpg")
+        val sourceJpgFile = getSelectedCoverArtFile(sourceSlot)
         if (sourceJpgFile.exists()) {
-            sourceJpgFile.copyTo(File(metadataDirPath, "$targetSlot.jpg"), true)
+            sourceJpgFile.copyTo(getSelectedCoverArtFile(targetSlot), true)
             sourceJpgFile.delete()
         }
 
-        val sourceCoverArtDir = File(metadataDirPath, "$sourceSlot")
+        val sourceCoverArtDir = getPotentialCoverArtFilesDir(sourceSlot)
         if (sourceCoverArtDir.exists() && sourceCoverArtDir.isDirectory) {
-            val targetAlbumDir = File(metadataDirPath, "$targetSlot")
+            val targetAlbumDir = getPotentialCoverArtFilesDir(targetSlot)
             targetAlbumDir.deleteRecursively()
             sourceCoverArtDir.copyRecursively(targetAlbumDir)
             sourceCoverArtDir.deleteRecursively()
         }
 
         logger.info("Successfully moved slot $sourceSlot to slot $targetSlot")
+    }
+
+    private fun getMetadataFile(slot: Int) = File(metadataDirPath, "${padded(slot)}.json")
+
+    private fun getSelectedCoverArtFile(slot: Int) = File(metadataDirPath, "${padded(slot)}.jpg")
+
+    fun getPotentialCoverArtFilesDir(slot: Int) = File(metadataDirPath, padded(slot))
+
+    private fun getPotentialCoverArtFile(slot: Int, index: Int): File {
+        val slotDir = getPotentialCoverArtFilesDir(slot).also { it.mkdirs() }
+        return File(slotDir, "${padded(index)}.jpg")
+    }
+
+    private fun padded(index: Int) = index.toString().padStart(2, '0')
+
+    fun getSlotsWithoutPotentialCoverArt(): List<Int> {
+        return getMetadataFiles().mapNotNull { metadataFile ->
+            metadataFile.nameWithoutExtension.toIntOrNull()?.let { slot ->
+                if (getPotentialCoverArtsFiles(slot).isEmpty())
+                    return@mapNotNull slot
+            }
+            return@mapNotNull null
+        }
     }
 }

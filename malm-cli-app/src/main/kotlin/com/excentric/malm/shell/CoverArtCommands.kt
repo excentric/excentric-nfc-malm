@@ -24,10 +24,15 @@ class CoverArtCommands(
 
     @ShellMethod(key = ["ca-download", "cad"], value = "Download cover art from Cover Art Archive")
     fun downloadArt(
-        @ShellOption(help = "Slot numbers") slots: String
+        @ShellOption(help = "Slot numbers", defaultValue = "") slots: String
     ) {
         doSafely {
-            parseSlotNumbers(slots).forEach { slot ->
+            val slotNumbers = if (slots.isEmpty())
+                metadataStorage.getSlotsWithoutPotentialCoverArt()
+            else
+                parseSlotNumbers(slots)
+
+            slotNumbers.toSet().forEach { slot ->
                 coverArtArchiveService.downloadCoverArt(slot)
             }
         }
@@ -66,7 +71,7 @@ class CoverArtCommands(
     fun openCoverArt(
         @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
-        val coverArtsUri = metadataStorage.getCoverArtsDir(slot).toURI()
+        val coverArtsUri = metadataStorage.getPotentialCoverArtFilesDir(slot).toURI()
 
         val os = System.getProperty("os.name").lowercase(getDefault())
 
