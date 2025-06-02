@@ -3,6 +3,7 @@ package com.excentric.malm.shell
 import com.excentric.malm.client.CoverArtArchiveClient
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.storage.MetadataStorage
+import com.excentric.malm.util.ConsoleColors.green
 import com.excentric.malm.util.SlotArgumentParser.parseSlotNumbers
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -34,11 +35,10 @@ class CoverArtCommands(
 
             val slotsMap = metadataStorage.getSlotsMap().filter { it.key in slotNumbers }
 
-            terminal.writer().print("\r[                    ] 0%")
-            terminal.writer().flush()
-
             val totalDownloads = slotsMap.flatMap { it.value.mbids }.size
             var completedDownloads = 0
+
+            startProgressBar()
 
             slotsMap.forEach { (slot, albumMetadata) ->
                 albumMetadata.mbids.forEachIndexed { index: Int, mbid: String ->
@@ -46,21 +46,10 @@ class CoverArtCommands(
                         metadataStorage.saveCoverArt(slot, index, coverArtFile)
                     }
                     completedDownloads++
-
-                    val percentage = completedDownloads * 100 / totalDownloads
-                    val progressBarWidth = 20
-                    val filledWidth = progressBarWidth * completedDownloads / totalDownloads
-
-                    val progressBar = "[" + "=".repeat(filledWidth) + " ".repeat(progressBarWidth - filledWidth) + "]"
-
-                    // Clear the line and print updated progress
-                    terminal.writer().print("\r$progressBar $percentage% [$completedDownloads / $totalDownloads]")
-                    terminal.writer().flush()
+                    updateProgressBar(completedDownloads, totalDownloads)
                 }
             }
-            // Print completion message
-            terminal.writer().println("\nCover art downloads complete")
-            terminal.writer().flush()
+            finishProgressBar()
 
             logger.info("Downloaded $completedDownloads cover art images for ${slotsMap.keys.count()} slot(s)")
         }

@@ -1,6 +1,7 @@
 package com.excentric.malm.shell
 
 import com.excentric.malm.errors.MalmException
+import com.excentric.malm.util.ConsoleColors.green
 import org.jline.terminal.Terminal
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,31 @@ abstract class AbstractShellCommands {
 
     abstract val logger: Logger
 
+    companion object {
+        const val PROGRESS_BAR_WIDTH = 20
+        const val ONE_HUNDRED = 100
+
+    }
+
+    protected fun startProgressBar() {
+        terminal.writer().print("\r[                    ] 0%")
+        terminal.writer().flush()
+    }
+
+    protected fun updateProgressBar(completedDownloads: Int, totalDownloads: Int) {
+        val percentage = completedDownloads * ONE_HUNDRED / totalDownloads
+        val filledWidth = PROGRESS_BAR_WIDTH * completedDownloads / totalDownloads
+        val progressBar = "[" + "=".repeat(filledWidth) + " ".repeat(PROGRESS_BAR_WIDTH - filledWidth) + "]"
+        // Clear the line and print updated progress
+        terminal.writer().print("\r$progressBar $percentage% [${green(completedDownloads.toString())}/$totalDownloads]")
+        terminal.writer().flush()
+    }
+
+    protected fun finishProgressBar() {
+        terminal.writer().println("\n")
+        terminal.writer().flush()
+    }
+
     protected fun createSingleItemSelector(
         selectorItems: MutableList<SelectorItem<String>>,
         message: String
@@ -37,7 +63,6 @@ abstract class AbstractShellCommands {
             command()
         } catch (e: MalmException) {
             logger.error(e.message)
-            terminal.writer().flush()
         }
     }
 }
