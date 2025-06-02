@@ -20,8 +20,8 @@ import java.lang.Math.PI
 
 class PdfLabelWriter(
     private val labels: List<AlbumLabelMetadata>,
+    private val pdfResourcePath: String = "Avery80x50-R-RectangleLabels-blank.pdf",
     private val shouldAddTestParagraphBorder: Boolean = false,
-    private val writeOverExistingPdfResource: Boolean = false,
 ) {
     companion object {
         const val LABEL_WIDTH = 132f
@@ -57,12 +57,9 @@ class PdfLabelWriter(
     }
 
     private fun createPdfThrowingException() {
-        if (writeOverExistingPdfResource) {
-            val reader = PdfReader(javaClass.classLoader.getResourceAsStream("Avery80x50-R-RectangleLabels-red.pdf"))
-            document = Document(PdfDocument(reader, writer))
-        } else {
-            document = Document(PdfDocument(writer))
-        }
+        // SC: we are using this blank one as it's coming straight from avery and launches with the right printer settings
+        val reader = PdfReader(javaClass.classLoader.getResourceAsStream(pdfResourcePath))
+        document = Document(PdfDocument(reader, writer))
 
         labels.forEach { label ->
             addLabel(label)
