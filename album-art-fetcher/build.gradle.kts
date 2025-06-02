@@ -7,6 +7,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":malm-metadata"))
     implementation(project(":malm-pdf"))
 
     implementation(libs.springBootStarter)

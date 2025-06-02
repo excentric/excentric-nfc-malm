@@ -4,3 +4,6 @@ spring:
       enabled: false
     log:
       enabled: false
+
+music-album-label-maker:
+  metadata-directory: ${user.home}/.album-metadata

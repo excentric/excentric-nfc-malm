@@ -1,6 +1,6 @@
 package com.excentric
 
-import com.excentric.model.storage.AlbumMetadata
+import com.excentric.malm.metadata.AlbumMetadata
 import com.excentric.service.MusicBrainzService
 import com.excentric.storage.MetadataStorage
 import com.excentric.util.ConsoleColors.green

@@ -19,7 +19,6 @@ import org.springframework.shell.jline.PromptProvider
 import org.springframework.web.client.RestTemplate
 import java.time.Duration.ofSeconds
 
-
 fun main(args: Array<String>) {
     SpringApplication.run(MusicBrainzApplication::class.java, *args)
 }

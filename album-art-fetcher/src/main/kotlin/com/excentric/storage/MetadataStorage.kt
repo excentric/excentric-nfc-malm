@@ -1,7 +1,7 @@
 package com.excentric.storage
 
 import com.excentric.errors.MalmException
-import com.excentric.model.storage.AlbumMetadata
+import com.excentric.malm.metadata.AlbumMetadata
 import com.excentric.util.ConsoleColors
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
@@ -128,8 +128,8 @@ class MetadataStorage(
         return emptyList()
     }
 
-    fun getAlbumArtFile(index: Int): File {
-        return File(metadataDirPath, "$index.jpg")
+    fun getAlbumArtFile(slot: Int): File {
+        return File(metadataDirPath, "$slot.jpg")
     }
 
     fun selectAlbumArt(slot: Int, selectedFile: File) {

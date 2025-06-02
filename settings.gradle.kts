@@ -11,6 +11,7 @@ plugins {
 }
 
 include(":album-art-fetcher")
+include(":malm-metadata")
 include(":malm-pdf")
 
-rootProject.name = "excentric-nfc-sonos"
+rootProject.name = "excentric-malm"

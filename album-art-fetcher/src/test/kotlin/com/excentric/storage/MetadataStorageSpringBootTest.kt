@@ -1,6 +1,8 @@
 package com.excentric.storage
 
 import com.excentric.MusicBrainzApplication
+import com.excentric.malm.metadata.AlbumLabelMetadata
+import com.excentric.malm.pdf.PdfLabelWriter
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,20 +17,13 @@ class MetadataStorageSpringBootTest {
 
     @Test
     fun `print current value of MetadataStorage getSlotsMap`() {
-        // Get the current slots map
         val slotsMap = metadataStorage.getSlotsMap()
+        val pdfSlotsMap = slotsMap.filter { it.key in (1..10) }
 
-        // Print the size of the map
-        System.out.println("[DEBUG_LOG] MetadataStorage.getSlotsMap() contains ${slotsMap.size} entries")
-
-        // Print each entry in the map
-        slotsMap.forEach { (slot, metadata) ->
-            System.out.println("[DEBUG_LOG] Slot $slot: ${metadata.artist} - ${metadata.album} (${metadata.year})")
+        val labels = pdfSlotsMap.map { (slot, albumMetadata) ->
+            AlbumLabelMetadata(slot, albumMetadata.album, albumMetadata.artist, albumMetadata.year, metadataStorage.getAlbumArtFile(slot))
         }
 
-        // If the map is empty, print a message
-        if (slotsMap.isEmpty()) {
-            System.out.println("[DEBUG_LOG] MetadataStorage.getSlotsMap() is empty")
-        }
+        PdfLabelWriter(labels).createPdf()
     }
 }

@@ -5,10 +5,8 @@ import com.excentric.config.MusicBrainzProperties
 import com.excentric.model.api.AlbumReleaseGroupModel
 import com.excentric.model.api.AlbumReleaseModel
 import com.excentric.model.api.ArtistModel
-import com.excentric.model.api.MusicBrainzArtistsModel
 import com.excentric.model.api.MusicBrainzReleasesModel
-import com.excentric.model.storage.AlbumMetadata
-import com.excentric.util.ConsoleColors.greenOrRed
+import com.excentric.malm.metadata.AlbumMetadata
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 

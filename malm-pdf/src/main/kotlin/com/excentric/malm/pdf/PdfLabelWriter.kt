@@ -1,5 +1,6 @@
 package com.excentric.malm.pdf
 
+import com.excentric.malm.metadata.AlbumLabelMetadata
 import com.itextpdf.io.font.constants.StandardFonts.HELVETICA_BOLD
 import com.itextpdf.io.image.ImageDataFactory
 import com.itextpdf.kernel.font.PdfFontFactory
@@ -14,7 +15,9 @@ import com.itextpdf.layout.properties.TextAlignment.CENTER
 import java.io.File
 import java.lang.Math.PI
 
-class PdfLabelWriter {
+class PdfLabelWriter(
+    private val labels: List<AlbumLabelMetadata>
+) {
     companion object {
         const val LABEL_WIDTH = 132f
         const val ROTATE_90_ANTI_CLOCKWISE = PI / 2
@@ -41,7 +44,7 @@ class PdfLabelWriter {
         10 to SlotPositionDetails(4, 1),
     )
 
-    fun runSafely() {
+    fun createPdf() {
         try {
             run()
         } catch (e: Exception) {
@@ -51,11 +54,10 @@ class PdfLabelWriter {
     }
 
     private fun run() {
-        val pdfDoc = PdfDocument(reader, writer)
-        document = Document(pdfDoc)
+        document = Document(PdfDocument(reader, writer))
 
-        slotPositionDetailsMap.keys.forEach {
-            addLabelForSlot(it)
+        labels.forEach { label ->
+            addLabel(label)
         }
 
         document.close()
@@ -63,14 +65,17 @@ class PdfLabelWriter {
         println("PDF successfully modified. Output saved to: ${File("output-hello-world.pdf").absolutePath}")
     }
 
-    private fun addLabelForSlot(slot: Int) {
-        val slotPosition = slotPositionDetailsMap[slot]!!
-        document.add(createParagraph(slotPosition, "Pink Floyd\nAnimals\n(1971)"))
-        document.add(createImage(slotPosition, "1/1.jpg"))
+    private fun addLabel(label: AlbumLabelMetadata) {
+        val slotPosition = slotPositionDetailsMap[label.slot]!!
+
+        val paragraphText = "${label.artist.orEmpty()}\n${label.title}\n${label.year.toString()}"
+
+        document.add(createParagraph(slotPosition, paragraphText))
+        document.add(createImage(slotPosition, label.albumArt.absolutePath))
     }
 
     private fun createImage(positionDetails: SlotPositionDetails, imagePath: String): Image {
-        return Image(ImageDataFactory.create(getAlbumArtPath(imagePath))).apply {
+        return Image(ImageDataFactory.create(imagePath)).apply {
             setWidth(LABEL_WIDTH)
             setHeight(LABEL_WIDTH)
             setRotationAngle(ROTATE_90_ANTI_CLOCKWISE)
@@ -90,9 +95,5 @@ class PdfLabelWriter {
             }
             setFixedPosition(positionDetails.paragraphLeft, positionDetails.paragraphBottom, LABEL_WIDTH) // x, y, width (increased width for vertical text)
         }
-    }
-
-    private fun getAlbumArtPath(albumArtPath: String): String {
-        return File(System.getProperty("user.home") + "/.album-metadata/$albumArtPath").absolutePath
     }
 }
