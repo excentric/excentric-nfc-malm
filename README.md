@@ -39,9 +39,9 @@ This project uses [Gradle](https://gradle.org/).
 
 The CLI application can be compiled to a native binary using GraalVM, which provides faster startup times and reduced memory usage:
 
-* Run `./build-native.sh` to build a native binary
+* Run `./scripts/build-native.sh` to build a native binary
 * The native binary will be created at `./malm-cli-app/build/native/nativeCompile/malm-cli-app`
-* The `cli-app.sh` script will automatically use the native binary if available
+* The `scripts/cli-app.sh` script will automatically use the native binary if available
 
 ## Usage
 
@@ -49,7 +49,7 @@ The CLI application can be compiled to a native binary using GraalVM, which prov
 
 Run the CLI application:
 ```
-./cli-app.sh
+./scripts/cli-app.sh
 ```
 
 This script will automatically use the native binary if it has been built, providing faster startup times. If the native binary is not available, it will fall back to using the JAR file.
@@ -81,14 +81,14 @@ The CLI application provides the following commands:
 
 #### Reading NFC Tags
 ```
-./read-tags.sh
+./scripts/read-tags.sh
 ```
 
 This will start the NFC reader and listen for NFC tags. When a tag is detected, it will read the command from the tag and send it to the configured Sonos speaker.
 
 #### Writing NFC Tags
 ```
-./write-tags.sh
+./scripts/write-tags.sh
 ```
 
 This will read album metadata from the `~/.malm/metadata` directory and write Apple Music album IDs to NFC tags when presented to the reader.

@@ -41,8 +41,8 @@ graalvmNative {
             buildArgs.add("-H:+ReportExceptionStackTraces")
             // Enable reflection for Spring Boot
             buildArgs.add("-H:+AddAllCharsets")
-            buildArgs.add("-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json")
-            buildArgs.add("-H:ResourceConfigurationFiles=src/main/resources/META-INF/native-image/resource-config.json")
+            buildArgs.add("-H:ReflectionConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/reflect-config.json")
+            buildArgs.add("-H:ResourceConfigurationFiles=${projectDir}/src/main/resources/META-INF/native-image/resource-config.json")
         }
     }
 }
