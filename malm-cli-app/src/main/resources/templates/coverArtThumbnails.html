@@ -4,46 +4,6 @@
   <meta charset="UTF-8">
   <title>Cover Art Thumbnails</title>
   <link rel="stylesheet" href="/css/coverArtThumbnails.css">
-  <style>
-      /* Modal styles */
-      .modal {
-          display: none;
-          position: fixed;
-          z-index: 1000;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          overflow: auto;
-          background-color: rgba(0, 0, 0, 0.8);
-      }
-
-      .modal-content {
-          margin: auto;
-          display: block;
-          max-width: 90%;
-          max-height: 90%;
-      }
-
-      .close {
-          position: absolute;
-          top: 15px;
-          right: 35px;
-          color: #f1f1f1;
-          font-size: 40px;
-          font-weight: bold;
-          cursor: pointer;
-      }
-
-      .thumbnail {
-          cursor: pointer;
-          transition: opacity 0.3s;
-      }
-
-      .thumbnail:hover {
-          opacity: 0.8;
-      }
-  </style>
 </head>
 <body>
 
@@ -69,35 +29,6 @@
   <img class="modal-content" id="fullImage">
 </div>
 
-<script>
-    // Get the modal
-    const modal = document.getElementById("imageModal");
-    const modalImg = document.getElementById("fullImage");
-
-    // Function to open the modal
-    function openModal(imgSrc) {
-        modal.style.display = "block";
-        modalImg.src = imgSrc;
-    }
-
-    // Function to close the modal
-    function closeModal() {
-        modal.style.display = "none";
-    }
-
-    // Close the modal when clicking outside the image
-    window.onclick = function (event) {
-        if (event.target === modal) {
-            closeModal();
-        }
-    }
-
-    // Close the modal when ESC key is pressed
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
-</script>
+<script src="/js/coverArtThumbnails.js"></script>
 </body>
 </html>
