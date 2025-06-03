@@ -11,6 +11,7 @@ springBoot = "3.2.3"
 springShell = "3.2.3"
 jackson = "2.15.3"
 junit = "5.10.1"
+itext7 = "7.2.5"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -20,11 +21,14 @@ kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", 
 springBootStarter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "springBoot" }
 springBootWeb = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
 springBootTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
+springBootJetty = { module = "org.springframework.boot:spring-boot-starter-jetty", version.ref = "springBoot" }
+springBootThymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf", version.ref = "springBoot" }
 springShell = { module = "org.springframework.shell:spring-shell-starter", version.ref = "springShell" }
 jacksonKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 junitJupiterApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 kotlinTest = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+itext7Core = { module = "com.itextpdf:itext7-core", version.ref = "itext7" }
 
 # Libraries can be bundled together for easier import
 [bundles]

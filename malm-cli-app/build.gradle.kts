@@ -14,8 +14,8 @@ dependencies {
     implementation(libs.springBootWeb) {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
     }
-    implementation("org.springframework.boot:spring-boot-starter-jetty")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation(libs.springBootJetty)
+    implementation(libs.springBootThymeleaf)
     implementation(libs.springShell)
     implementation(libs.kotlinxSerialization)
     implementation(libs.jacksonKotlin)

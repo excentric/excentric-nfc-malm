@@ -108,3 +108,7 @@ This project uses Gradle for building:
 
 The project uses a version catalog (see `gradle/libs.versions.toml`) to declare and version dependencies
 and both a build cache and a configuration cache (see `gradle.properties`).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

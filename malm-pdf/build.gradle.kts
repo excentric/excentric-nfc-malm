@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     implementation(project(":malm-metadata"))
-    implementation("com.itextpdf:itext7-core:7.2.5")
+    implementation(libs.itext7Core)
 
     implementation(libs.bundles.kotlinxEcosystem)
     testImplementation(libs.kotlinTest)
