@@ -11,9 +11,6 @@ import org.springframework.shell.component.support.SelectorItem
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
-import java.awt.Desktop
-import java.awt.Desktop.Action.BROWSE
-import java.util.Locale.getDefault
 
 @ShellComponent
 class CoverArtCommands(
@@ -88,16 +85,7 @@ class CoverArtCommands(
     fun openCoverArt(
         @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
-        val coverArtsUri = metadataStorage.getPotentialCoverArtFilesDir(slot).toURI()
-
-        val os = System.getProperty("os.name").lowercase(getDefault())
-
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(BROWSE)) {
-            Desktop.getDesktop().browse(coverArtsUri);
-        } else if (os.indexOf("mac") >= 0) {
-            ProcessBuilder("open", "http://localhost:8062/ca/${slot}").start().waitFor()
-        } else {
-            logger.warn("Could not open cover art folder, browse here: $coverArtsUri")
-        }
+        val coverArtSelectorUri = "http://localhost:8062/ca/${slot}"
+        openUriOnOperatingSystem(coverArtSelectorUri)
     }
 }

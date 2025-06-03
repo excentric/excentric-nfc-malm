@@ -22,6 +22,7 @@ class PdfLabelWriter(
     private val labels: List<LabelMetadata>,
     private val pdfResourcePath: String = "Avery80x50-R-RectangleLabels-blank.pdf",
     private val shouldAddTestParagraphBorder: Boolean = false,
+    val outputFile: File,
 ) {
     companion object {
         const val LABEL_WIDTH = 132f
@@ -30,7 +31,7 @@ class PdfLabelWriter(
     }
 
 
-    private val writer = PdfWriter(File("output-hello-world.pdf"))
+    private val writer = PdfWriter(outputFile)
 
     private lateinit var document: Document
 
@@ -67,7 +68,7 @@ class PdfLabelWriter(
 
         document.close()
 
-        println("PDF successfully modified. Output saved to: ${File("output-hello-world.pdf").absolutePath}")
+        println("PDF successfully modified. Output saved to: ${outputFile.absolutePath}")
     }
 
     private fun addLabel(label: LabelMetadata) {

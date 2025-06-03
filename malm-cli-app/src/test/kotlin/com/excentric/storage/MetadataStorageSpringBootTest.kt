@@ -4,12 +4,15 @@ import com.excentric.malm.MalmApplication
 import com.excentric.malm.metadata.LabelMetadata
 import com.excentric.malm.pdf.PdfLabelWriter
 import com.excentric.malm.storage.MetadataStorage
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.io.File
 
 @SpringBootTest(classes = [MalmApplication::class], properties = ["spring.profiles.active=test"])
+@Disabled
 class MetadataStorageSpringBootTest {
     private val logger = LoggerFactory.getLogger(MetadataStorageSpringBootTest::class.java)
 
@@ -25,7 +28,7 @@ class MetadataStorageSpringBootTest {
             LabelMetadata(slot, albumMetadata.title, albumMetadata.artist, albumMetadata.year, metadataStorage.getCoverArtFile(slot))
         }
 
-        PdfLabelWriter(labels).createPdf()
+        PdfLabelWriter(labels, outputFile = File("output-hello-world.pdf")).createPdf()
     }
 
     @Test

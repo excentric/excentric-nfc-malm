@@ -20,4 +20,5 @@ music-album-label-maker:
     api.url: https://musicbrainz.org/ws/2/
     release-year-covers-only: true
   cover-art-archive.url: https://coverartarchive.org/
-  metadata-directory: ${user.home}/.album-metadata
+  metadata-directory: ${user.home}/.malm/metadata
+  pdf-directory: ${user.home}/.malm/pdfs

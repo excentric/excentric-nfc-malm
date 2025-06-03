@@ -9,6 +9,10 @@ import org.springframework.core.io.ResourceLoader
 import org.springframework.shell.component.SingleItemSelector
 import org.springframework.shell.component.support.SelectorItem
 import org.springframework.shell.style.TemplateExecutor
+import java.awt.Desktop
+import java.awt.Desktop.Action.BROWSE
+import java.net.URI
+import java.util.Locale.getDefault
 
 abstract class AbstractShellCommands {
     @Autowired
@@ -63,6 +67,17 @@ abstract class AbstractShellCommands {
             command()
         } catch (e: MalmException) {
             logger.error(e.message)
+        }
+    }
+
+    protected fun openUriOnOperatingSystem(uriOrPath: String) {
+        val os = System.getProperty("os.name").lowercase(getDefault())
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(BROWSE)) {
+            Desktop.getDesktop().browse(URI(uriOrPath));
+        } else if (os.indexOf("mac") >= 0) {
+            ProcessBuilder("open", uriOrPath).start().waitFor()
+        } else {
+            logger.warn("Could not open $uriOrPath")
         }
     }
 }
