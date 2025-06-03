@@ -31,9 +31,9 @@ export const nfcCard = require('nfccard-tool');
 // Common NFC utility functions
 export function logReaderAttached(reader: NFCReader) {
     console.log("");
-    console.log(`****************************************`);
+    console.log(`******************************************`);
     console.log(`${reader.reader.name} device attached`);
-    console.log(`****************************************`);
+    console.log(`******************************************`);
     console.log("");
 }
 
