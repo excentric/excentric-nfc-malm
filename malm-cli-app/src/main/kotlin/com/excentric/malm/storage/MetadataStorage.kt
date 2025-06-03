@@ -171,7 +171,7 @@ class MetadataStorage(
 
     private fun getSelectedCoverArtFile(slot: Int) = File(metadataDirPath, "${padded(slot)}.jpg")
 
-    fun getPotentialCoverArtFilesDir(slot: Int) = File(metadataDirPath, padded(slot))
+    private fun getPotentialCoverArtFilesDir(slot: Int) = File(metadataDirPath, padded(slot))
 
     fun getPotentialCoverArtFile(slot: Int, index: Int): File {
         val slotDir = getPotentialCoverArtFilesDir(slot).also { it.mkdirs() }
@@ -220,5 +220,19 @@ class MetadataStorage(
             }
         }
         return null
+    }
+
+    fun getSlotsWithoutAppleMusicIds(): Set<Int> {
+        return getSlotsMap().filter { it.value.appleMusicAlbumId == null }.keys
+    }
+
+    fun updateAppleMusicId(slot: Int, appleMusicAlbumId: String?) {
+        val albumMetadataFile = getMetadataFile(slot)
+        if (albumMetadataFile.exists()) {
+            val albumMetadata = objectMapper.readValue(albumMetadataFile, AlbumMetadata::class.java)
+            albumMetadata.appleMusicAlbumId = appleMusicAlbumId
+            objectMapper.writeValue(albumMetadataFile, albumMetadata)
+            logger.info("Updated slot $slot with apple music album id: $appleMusicAlbumId")
+        }
     }
 }

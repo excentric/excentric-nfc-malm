@@ -17,6 +17,7 @@ import org.springframework.shell.standard.ShellOption
 @ShellComponent
 class MusicBrainzCommands(
     private val coverArtCommands: CoverArtCommands,
+    private val appleMusicCommands: AppleMusicCommands,
     private val musicBrainzService: MusicBrainzService,
     private val metadataStorage: MetadataStorage,
 ) : AbstractShellCommands() {
@@ -83,6 +84,7 @@ class MusicBrainzCommands(
             logAlbumResult(albumMetadata)
             val slot = metadataStorage.saveToNextAvailableSlot(albumMetadata)
             if (slot != null) {
+                appleMusicCommands.updateAppleMusicAlbumIds(slot.toString())
                 coverArtCommands.downloadArt(slot.toString())
                 coverArtCommands.openCoverArt(slot)
             }

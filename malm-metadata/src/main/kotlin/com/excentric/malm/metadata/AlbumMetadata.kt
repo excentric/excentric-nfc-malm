@@ -8,4 +8,6 @@ data class AlbumMetadata(
     val title: String,
     val artist: String?,
     val year: Int?,
-)
+) {
+    var appleMusicAlbumId: String? = null
+}

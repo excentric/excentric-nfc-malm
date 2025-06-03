@@ -10,7 +10,6 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-include(":malm-apple-music")
 include(":malm-cli-app")
 include(":malm-metadata")
 include(":malm-pdf")
