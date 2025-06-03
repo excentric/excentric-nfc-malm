@@ -7,6 +7,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":malm-apple-music"))
     implementation(project(":malm-metadata"))
     implementation(project(":malm-pdf"))
 

@@ -24,7 +24,7 @@ class AppleMusicSearcher {
             java.net.http.HttpResponse.BodyHandlers.ofString()
         )
 
-        val mapper: ObjectMapper = ObjectMapper()
+        val mapper = ObjectMapper()
         val root: JsonNode = mapper.readTree(response.body())
         val results: JsonNode = root.get("results")
 
@@ -39,6 +39,6 @@ class AppleMusicSearcher {
             }
         }
 
-        return null // Not found
+        return null
     }
 }
