@@ -20,13 +20,13 @@ import org.springframework.web.client.RestTemplate
 import java.time.Duration.ofSeconds
 
 fun main(args: Array<String>) {
-    SpringApplication.run(MusicBrainzApplication::class.java, *args)
+    SpringApplication.run(MalmApplication::class.java, *args)
 }
 
 @SpringBootApplication
 @CommandScan
 @ConfigurationPropertiesScan("com.excentric.malm.config")
-open class MusicBrainzApplication {
+open class MalmApplication {
     companion object {
         private val FIVE_SECONDS = ofSeconds(5L)
     }

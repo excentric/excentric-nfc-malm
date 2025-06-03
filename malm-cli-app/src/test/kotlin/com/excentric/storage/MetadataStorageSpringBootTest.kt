@@ -1,6 +1,6 @@
 package com.excentric.storage
 
-import com.excentric.malm.MusicBrainzApplication
+import com.excentric.malm.MalmApplication
 import com.excentric.malm.metadata.LabelMetadata
 import com.excentric.malm.pdf.PdfLabelWriter
 import com.excentric.malm.storage.MetadataStorage
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest(classes = [MusicBrainzApplication::class])
+@SpringBootTest(classes = [MalmApplication::class])
 class MetadataStorageSpringBootTest {
     private val logger = LoggerFactory.getLogger(MetadataStorageSpringBootTest::class.java)
 

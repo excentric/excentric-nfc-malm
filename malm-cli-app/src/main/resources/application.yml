@@ -1,8 +1,10 @@
 spring:
   main:
-    web-application-type: none
+    web-application-type: servlet
   shell:
     noninteractive.enabled: false
+server:
+  port: 8062
 
 #logging:
 #  level:
