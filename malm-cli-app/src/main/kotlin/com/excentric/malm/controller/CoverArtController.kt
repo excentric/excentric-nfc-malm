@@ -45,6 +45,7 @@ class CoverArtController(
     @GetMapping("/ca/{slot}/select/{index}")
     fun selectCoverArt(@PathVariable slot: Int, @PathVariable index: Int, model: Model): String {
         metadataStorage.selectCoverArt(slot, index)
+        model.addAttribute("selectedCoverArtIndex", index)
         return "redirect:/ca/$slot"
     }
 }

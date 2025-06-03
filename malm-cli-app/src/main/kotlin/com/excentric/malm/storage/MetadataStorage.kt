@@ -24,7 +24,10 @@ class MetadataStorage(
             }
     }
 
+    var albumMetadata: AlbumMetadata? = null
+
     fun saveToNextAvailableSlot(albumMetadata: AlbumMetadata): Int? {
+        this.albumMetadata = albumMetadata
         val slot = findNextAvailableSlot()
         if (slot == null) {
             logger.warn("No free slots!")
@@ -33,7 +36,7 @@ class MetadataStorage(
         return slot
     }
 
-    private fun saveToSlot(slot: Int, albumMetadata: AlbumMetadata) {
+    private fun saveToSlot(slot: Int, albumMetadata: AlbumMetadata? = this.albumMetadata) {
         validate(slot, albumMetadata)
 
         try {

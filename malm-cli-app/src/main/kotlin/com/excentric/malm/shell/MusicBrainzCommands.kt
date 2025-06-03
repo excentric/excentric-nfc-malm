@@ -31,10 +31,7 @@ class MusicBrainzCommands(
         logger.info("Searching for album: $album by artist: $artist")
         val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
         logAlbumResult(albumMetadata)
-        val slot = metadataStorage.saveToNextAvailableSlot(albumMetadata)
-        if (slot != null) {
-            coverArtCommands.downloadArt(slot.toString())
-        }
+        metadataStorage.albumMetadata = albumMetadata
     }
 
     @ShellMethod(key = ["mb-search-artist", "mbsa"], value = "Search MusicBrainz by artist name")

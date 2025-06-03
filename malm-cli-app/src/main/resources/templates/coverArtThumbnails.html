@@ -18,11 +18,12 @@
 <div th:unless="${imageIndexes.size() == 0}" class="thumbnail-container">
 
   <div th:each="index : ${imageIndexes}" class="thumbnail-wrapper">
-    <img class="thumbnail"
+    <img class="thumbnail" th:classappend="${index == selectedCoverArtIndex ? 'selected-thumbnail' : ''}"
          th:src="@{'/ca/' + ${slot} + '/image/' + ${index}}"
          th:onclick="'openModal(\'/ca/' + ${slot} + '/image/' + ${index} + '\')'"
          alt="Cover Art Image"/>
-    <a href="#" th:onclick="'selectAndClose(\'/ca/' + ${slot} + '/select/' + ${index} + '\')'" class="select-link">Select</a>
+    <a href="#" th:if="${index != selectedCoverArtIndex}" th:onclick="'selectAndClose(\'/ca/' + ${slot} + '/select/' + ${index} + '\')'" class="select-link">Select</a>
+    <span th:if="${index == selectedCoverArtIndex}" class="selected-text">Cover</span>
   </div>
 </div>
 
