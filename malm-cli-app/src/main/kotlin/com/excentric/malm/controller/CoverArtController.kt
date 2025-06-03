@@ -17,9 +17,11 @@ class CoverArtController(
     @GetMapping("/ca/{slot}")
     fun getCoverArtThumbnails(@PathVariable slot: Int, model: Model): String {
         val coverArtFiles = metadataStorage.getPotentialCoverArtsFiles(slot)
+        val albumMetadata = metadataStorage.getSlotsMap()[slot]
 
         model.addAttribute("slot", slot)
         model.addAttribute("imageCount", coverArtFiles.size)
+        model.addAttribute("album", albumMetadata)
 
         return "coverArtThumbnails"
     }

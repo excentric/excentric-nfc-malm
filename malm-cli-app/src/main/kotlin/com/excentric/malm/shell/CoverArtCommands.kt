@@ -95,8 +95,7 @@ class CoverArtCommands(
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(BROWSE)) {
             Desktop.getDesktop().browse(coverArtsUri);
         } else if (os.indexOf("mac") >= 0) {
-            val rt = Runtime.getRuntime()
-            rt.exec("open $coverArtsUri")
+            ProcessBuilder("open", "http://localhost:8062/ca/${slot}").start().waitFor()
         } else {
             logger.warn("Could not open cover art folder, browse here: $coverArtsUri")
         }

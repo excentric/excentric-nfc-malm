@@ -94,7 +94,7 @@ class MusicBrainzCommands(
 
     private fun logAlbumResult(album: AlbumMetadata) {
         logger.info("IDs: ${greenOrRed(album.mbids)}")
-        logger.info("Album: ${greenOrRed(album.album)}")
+        logger.info("Album: ${greenOrRed(album.title)}")
         logger.info("Artist: ${greenOrRed(album.artist)}")
         logger.info("Year: ${greenOrRed(album.year)}")
     }

@@ -32,7 +32,7 @@ class MalmShellCommands(
 
             slotsMap.forEach { (index, metadata) ->
                 val coverArtStatus = getCoverArtStatus(index)
-                logger.info("Slot $index: Album: ${greenOrRed(metadata.album)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $coverArtStatus")
+                logger.info("Slot $index: Album: ${greenOrRed(metadata.title)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $coverArtStatus")
             }
         }
     }

@@ -22,7 +22,7 @@ class MetadataStorageSpringBootTest {
         val pdfSlotsMap = slotsMap.filter { it.key in (1..10) }
 
         val labels = pdfSlotsMap.map { (slot, albumMetadata) ->
-            LabelMetadata(slot, albumMetadata.album, albumMetadata.artist, albumMetadata.year, metadataStorage.getCoverArtFile(slot))
+            LabelMetadata(slot, albumMetadata.title, albumMetadata.artist, albumMetadata.year, metadataStorage.getCoverArtFile(slot))
         }
 
         PdfLabelWriter(labels).createPdf()
