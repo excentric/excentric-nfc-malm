@@ -18,10 +18,12 @@ class CoverArtController(
     fun getCoverArtThumbnails(@PathVariable slot: Int, model: Model): String {
         val coverArtFiles = metadataStorage.getPotentialCoverArtsFiles(slot)
         val albumMetadata = metadataStorage.getSlotsMap()[slot]
+        val selectedCoverArtIndex = metadataStorage.getSelectedCoverArtIndex(slot)
 
         model.addAttribute("slot", slot)
-        model.addAttribute("imageIndexes", coverArtFiles.map { it.nameWithoutExtension.toInt() })
         model.addAttribute("album", albumMetadata)
+        model.addAttribute("imageIndexes", coverArtFiles.map { it.nameWithoutExtension.toInt() })
+        model.addAttribute("selectedCoverArtIndex", selectedCoverArtIndex)
 
         return "coverArtThumbnails"
     }

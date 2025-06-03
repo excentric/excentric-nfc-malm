@@ -187,6 +187,28 @@ class MetadataStorage(
         }
     }
 
+    fun getSelectedCoverArtIndex(slot: Int): Int? {
+        val selectedFile = getSelectedCoverArtFile(slot)
+        if (!selectedFile.exists()) {
+            return null
+        }
+
+        val potentialFiles = getPotentialCoverArtsFiles(slot)
+        if (potentialFiles.isEmpty()) {
+            return null
+        }
+
+        val selectedBytes = selectedFile.readBytes()
+
+        for (potentialFile in potentialFiles) {
+            if (potentialFile.readBytes().contentEquals(selectedBytes)) {
+                return potentialFile.nameWithoutExtension.toIntOrNull()
+            }
+        }
+
+        return null
+    }
+
     private fun findNextAvailableSlot(): Int? {
         val occupiedSlots = getSlotsMap().keys
         for (slot in 1..99) {
