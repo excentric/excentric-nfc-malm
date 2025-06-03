@@ -24,25 +24,21 @@ class MetadataStorage(
             }
     }
 
-    var albumMetadata: AlbumMetadata? = null
-
-    fun saveToNextAvailableSlot(albumMetadata: AlbumMetadata) {
-        this.albumMetadata = albumMetadata
+    fun saveToNextAvailableSlot(albumMetadata: AlbumMetadata): Int? {
         val slot = findNextAvailableSlot()
         if (slot == null) {
             logger.warn("No free slots!")
         } else
-            saveToSlot(slot)
+            saveToSlot(slot, albumMetadata)
+        return slot
     }
 
-    fun saveToSlot(slot: Int) {
-        val metadata = albumMetadata
+    private fun saveToSlot(slot: Int, albumMetadata: AlbumMetadata) {
+        validate(slot, albumMetadata)
 
-        validate(slot, metadata)
-
-        return try {
+        try {
             val metadataFile = getMetadataFile(slot)
-            objectMapper.writeValue(metadataFile, metadata)
+            objectMapper.writeValue(metadataFile, albumMetadata)
             logger.info("Successfully saved album metadata to slot ${green(slot.toString())}")
         } catch (e: Exception) {
             throw MalmException("Failed to save album metadata to slot $slot: ${e.message}")

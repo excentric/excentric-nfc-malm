@@ -47,16 +47,6 @@ class MalmShellCommands(
         }
     }
 
-    @ShellMethod(key = ["save-to-slot", "s"], value = "Save current album metadata to a numbered slot (1-99)")
-    fun saveToSlot(
-        @ShellOption(help = "Slot number (1-99)") slot: Int
-    ) {
-        logger.info("Saving album metadata to slot: $slot")
-        doSafely {
-            metadataStorage.saveToSlot(slot)
-        }
-    }
-
     @ShellMethod(key = ["move-slot", "mv"], value = "Move a slot from one position to another")
     fun moveSlot(
         @ShellOption(help = "Source slot number (1-99)") sourceSlot: Int,

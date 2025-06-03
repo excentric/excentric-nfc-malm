@@ -16,6 +16,7 @@ import org.springframework.shell.standard.ShellOption
 
 @ShellComponent
 class MusicBrainzCommands(
+    private val coverArtCommands: CoverArtCommands,
     private val musicBrainzService: MusicBrainzService,
     private val metadataStorage: MetadataStorage,
 ) : AbstractShellCommands() {
@@ -30,7 +31,10 @@ class MusicBrainzCommands(
         logger.info("Searching for album: $album by artist: $artist")
         val albumMetadata = musicBrainzService.searchMusicBrainz(artist, album)
         logAlbumResult(albumMetadata)
-        metadataStorage.albumMetadata = albumMetadata
+        val slot = metadataStorage.saveToNextAvailableSlot(albumMetadata)
+        if (slot != null) {
+            coverArtCommands.downloadArt(slot.toString())
+        }
     }
 
     @ShellMethod(key = ["mb-search-artist", "mbsa"], value = "Search MusicBrainz by artist name")
@@ -80,7 +84,10 @@ class MusicBrainzCommands(
 
             val albumMetadata = AlbumMetadata(release.releases?.map { it.id }.orEmpty(), release.title, artist.name, release.getYear())
             logAlbumResult(albumMetadata)
-            metadataStorage.saveToNextAvailableSlot(albumMetadata)
+            val slot = metadataStorage.saveToNextAvailableSlot(albumMetadata)
+            if (slot != null) {
+                coverArtCommands.downloadArt(slot.toString())
+            }
         }
     }
 
