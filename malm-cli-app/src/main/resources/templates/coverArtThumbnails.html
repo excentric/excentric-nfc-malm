@@ -8,14 +8,14 @@
 <body>
 <h1 th:text="'Cover Art for Slot ' + ${slot}">Cover Art</h1>
 
-<div th:if="${encodedImages.isEmpty()}">
+<div th:if="${imageCount == 0}">
   <h1 th:text="'No cover art found for slot ' + ${slot}">No cover art found</h1>
 </div>
 
-<div th:unless="${encodedImages.isEmpty()}" class="thumbnail-container">
-  <img th:each="image : ${encodedImages}"
+<div th:unless="${imageCount == 0}" class="thumbnail-container">
+  <img th:each="index : ${#numbers.sequence(0, imageCount - 1)}"
        class="thumbnail"
-       th:src="'data:image/jpeg;base64,' + ${image.base64Data}" alt=""/>
+       th:src="@{'/ca/' + ${slot} + '/image/' + ${index}}" alt="Cover Art Image"/>
 </div>
 </body>
 </html>
