@@ -17,12 +17,14 @@ nfc.on('reader', (reader: NFCReader) => {
                 const NDEFMessage: NDEFMessage[] = nfcCard.parseNDEF(NDEFRawMessage);
 
                 let sonosCommand = NDEFMessage[0].text;
+
                 console.log(`Detected Sonos Command: ${getGreenText(sonosCommand)}`,);
 
-                console.log(`Clearing Sonos Queue`,);
-                await makeSonosRequest("clearqueue", settings.sonosRoom);
-
-                await new Promise(resolve => setTimeout(resolve, 100));
+                if (sonosCommand.startsWith("applemusic")) {
+                    console.log(`Clearing queue before playing...`,);
+                    await makeSonosRequest("clearqueue", settings.sonosRoom);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
 
                 await makeSonosRequest(sonosCommand, settings.sonosRoom);
 
