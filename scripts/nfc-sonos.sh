@@ -7,6 +7,7 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 # Change to the malm-nfc directory
 cd "$PROJECT_ROOT/malm-nfc"
 
+export PATH=$PROJECT_ROOT/.gradle/nodejs/node-v21.6.2-linux-x64/bin:$PATH
 # Run the read-tag npm script
 npm run read-tag -- "$@"
 
