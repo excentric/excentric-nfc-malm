@@ -16,6 +16,8 @@ import kotlin.math.roundToInt
 class CoverArtController(
     private val metadataStorage: MetadataStorage
 ) {
+    // Cache for image metadata, keyed by file path and size
+    private val imageMetadataCache = mutableMapOf<Pair<String, Long>, ImageMetadata>()
 
     @GetMapping("/ca/{slot}")
     fun getCoverArtThumbnails(@PathVariable slot: Int, model: Model): String {
@@ -56,17 +58,24 @@ class CoverArtController(
     @GetMapping("/ca/{slot}/select/{index}")
     fun selectCoverArt(@PathVariable slot: Int, @PathVariable index: Int, model: Model): String {
         metadataStorage.selectCoverArt(slot, index)
-        model.addAttribute("selectedCoverArtIndex", index)
         return "redirect:/ca/$slot"
     }
 
-    fun getImageMetadata(file: File): ImageMetadata {
-        val sizeKB = (file.length() / 1024.0).roundToInt()
 
-        val bufferedImage = ImageIO.read(file)
-        val width = bufferedImage.width
-        val height = bufferedImage.height
+    private fun getImageMetadata(file: File): ImageMetadata {
+        val fileSize = file.length()
+        val cacheKey = Pair(file.absolutePath, fileSize)
 
-        return ImageMetadata(sizeKB, width, height)
+        // Check if metadata is already in cache
+        return imageMetadataCache.getOrPut(cacheKey) {
+            // If not in cache, read from file and store in cache
+            val sizeKB = (fileSize / 1024.0).roundToInt()
+
+            val bufferedImage = ImageIO.read(file)
+            val width = bufferedImage.width
+            val height = bufferedImage.height
+
+            ImageMetadata(sizeKB, width, height)
+        }
     }
 }
