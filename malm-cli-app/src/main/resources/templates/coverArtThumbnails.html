@@ -16,11 +16,13 @@
 </div>
 
 <div th:unless="${imageCount == 0}" class="thumbnail-container">
-  <img th:each="index : ${#numbers.sequence(0, imageCount - 1)}"
-       class="thumbnail"
-       th:src="@{'/ca/' + ${slot} + '/image/' + ${index}}"
-       th:onclick="'openModal(\'/ca/' + ${slot} + '/image/' + ${index} + '\')'"
-       alt="Cover Art Image"/>
+  <div th:each="index : ${#numbers.sequence(0, imageCount - 1)}" class="thumbnail-wrapper">
+    <img class="thumbnail"
+         th:src="@{'/ca/' + ${slot} + '/image/' + ${index}}"
+         th:onclick="'openModal(\'/ca/' + ${slot} + '/image/' + ${index} + '\')'"
+         alt="Cover Art Image"/>
+    <a th:href="@{'/ca/' + ${slot} + '/select/' + ${index}}" class="select-link">Select</a>
+  </div>
 </div>
 
 <!-- The Modal -->

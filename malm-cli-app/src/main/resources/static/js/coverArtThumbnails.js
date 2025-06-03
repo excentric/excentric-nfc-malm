@@ -21,7 +21,7 @@ window.onclick = function (event) {
 }
 
 // Close the modal when ESC key is pressed
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
         closeModal();
     }

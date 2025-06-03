@@ -22,6 +22,24 @@ body {
     opacity: 0.8;
 }
 
+.thumbnail-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.select-link {
+    margin-top: 5px;
+    text-decoration: none;
+    color: #0066cc;
+    font-weight: bold;
+}
+
+.select-link:hover {
+    text-decoration: underline;
+}
+
 /* Modal styles */
 .modal {
     display: none;
