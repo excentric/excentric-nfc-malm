@@ -39,7 +39,7 @@ class MetadataStorage(
         try {
             val metadataFile = getMetadataFile(slot)
             objectMapper.writeValue(metadataFile, albumMetadata)
-            logger.info("Successfully saved album metadata to slot ${green(slot.toString())}")
+            logger.info("Saved album to slot ${green(slot.toString())}")
         } catch (e: Exception) {
             throw MalmException("Failed to save album metadata to slot $slot: ${e.message}")
         }

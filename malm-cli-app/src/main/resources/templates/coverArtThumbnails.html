@@ -6,7 +6,10 @@
   <link rel="stylesheet" href="/css/coverArtThumbnails.css">
 </head>
 <body>
-<h1 th:text="'Cover Art for Slot ' + ${slot}">Cover Art</h1>
+
+<div th:if="${album != null}">
+  <h1 th:text="${album.title} + ' by ' + ${album.artist} + ' (' + ${album.year} + ')'">Cover Art</h1>
+</div>
 
 <div th:if="${imageCount == 0}">
   <h1 th:text="'No cover art found for slot ' + ${slot}">No cover art found</h1>
