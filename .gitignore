@@ -17,6 +17,8 @@ out/
 .kotlin
 */.kotlin
 
+node_modules
+
 ### Eclipse ###
 .apt_generated
 .classpath
