@@ -76,6 +76,10 @@ abstract class AbstractShellCommands {
             Desktop.getDesktop().browse(URI(uriOrPath));
         } else if (os.indexOf("mac") >= 0) {
             ProcessBuilder("open", uriOrPath).start().waitFor()
+        } else if (os.indexOf("linux") >= 0) {
+            ProcessBuilder("xdg-open", uriOrPath).start().waitFor()
+        } else if (os.indexOf("win") >= 0) {
+            ProcessBuilder("cmd", "/c", "start", uriOrPath).start().waitFor()
         } else {
             logger.warn("Could not open $uriOrPath")
         }
