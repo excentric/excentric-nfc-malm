@@ -9,7 +9,7 @@ plugins {
 // Configure the node plugin
 node {
     // Set the version of Node.js to use
-    version.set("20.0.0")
+    version.set("21.6.2")
     // Download node using the plugin
     download.set(true)
     // Set the working directory for node tasks
