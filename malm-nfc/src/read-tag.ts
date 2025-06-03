@@ -47,12 +47,8 @@ nfc.on('reader', (reader: NFCReader) => {
             }
 
         } catch (err: unknown) {
-            notifier.notify({
-                title: 'Error - please try again...',
-                message: 'Error - please try again...',
-                sound: false, // Only Notification Center or Windows Toasters
-                wait: false // Don't wait for user interaction
-            });
+            desktopNotify(`Error reading NFC`, `Please try again...`);
+
             console.error(`${getRedText("Error:")} when reading data. Keep trying...`, err);
         }
     });
