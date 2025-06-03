@@ -14,32 +14,26 @@ import org.springframework.http.MediaType
 class CoverArtController(
     private val metadataStorage: MetadataStorage
 ) {
-    
+
+    data class EncodedImage(val base64Data: String)
+
     @GetMapping("/ca/{slot}")
-    @ResponseBody
-    fun getCoverArtThumbnails(@PathVariable slot: Int): String {
+    fun getCoverArtThumbnails(@PathVariable slot: Int, model: Model): String {
         val coverArtFiles = metadataStorage.getPotentialCoverArtsFiles(slot)
-        
-        if (coverArtFiles.isEmpty()) {
-            return "<html><body><h1>No cover art found for slot $slot</h1></body></html>"
+
+        // Pre-encode the images to Base64
+        val encodedImages = coverArtFiles.map { file ->
+            try {
+                EncodedImage(Base64.getEncoder().encodeToString(file.readBytes()))
+            } catch (e: Exception) {
+                // Return an empty string if there's an error reading the file
+                EncodedImage("")
+            }
         }
-        
-        val htmlBuilder = StringBuilder()
-        htmlBuilder.append("<html><head><style>")
-        htmlBuilder.append("body { font-family: Arial, sans-serif; margin: 20px; }")
-        htmlBuilder.append(".thumbnail-container { display: flex; flex-wrap: wrap; gap: 10px; }")
-        htmlBuilder.append(".thumbnail { width: 250px; height: 250px; object-fit: contain; border: 1px solid #ddd; }")
-        htmlBuilder.append("</style></head><body>")
-        htmlBuilder.append("<h1>Cover Art for Slot $slot</h1>")
-        htmlBuilder.append("<div class=\"thumbnail-container\">")
-        
-        coverArtFiles.forEach { file ->
-            val base64Image = Base64.getEncoder().encodeToString(file.readBytes())
-            htmlBuilder.append("<img class=\"thumbnail\" src=\"data:image/jpeg;base64,$base64Image\" />")
-        }
-        
-        htmlBuilder.append("</div></body></html>")
-        
-        return htmlBuilder.toString()
+
+        model.addAttribute("slot", slot)
+        model.addAttribute("encodedImages", encodedImages)
+
+        return "coverArtThumbnails"
     }
 }
