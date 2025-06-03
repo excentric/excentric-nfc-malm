@@ -4,6 +4,7 @@ spring:
       enabled: false
     log:
       enabled: false
+      file: ${user.home}/.malm/spring-shell.log
 
 server:
   port: 8063

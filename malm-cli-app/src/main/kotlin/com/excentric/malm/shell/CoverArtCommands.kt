@@ -1,6 +1,7 @@
 package com.excentric.malm.shell
 
 import com.excentric.malm.client.CoverArtArchiveClient
+import com.excentric.malm.config.ServerProperties
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.storage.MetadataStorage
 import com.excentric.malm.util.SlotArgumentParser.parseSlotNumbers
@@ -16,6 +17,7 @@ import org.springframework.shell.standard.ShellOption
 class CoverArtCommands(
     private val coverArtArchiveClient: CoverArtArchiveClient,
     private val metadataStorage: MetadataStorage,
+    private val serverProperties: ServerProperties,
 ) : AbstractShellCommands() {
     override val logger: Logger = LoggerFactory.getLogger(CoverArtCommands::class.java)
 
@@ -85,7 +87,7 @@ class CoverArtCommands(
     fun openCoverArt(
         @ShellOption(help = "Slot number (1-99)") slot: Int
     ) {
-        val coverArtSelectorUri = "http://localhost:8062/ca/${slot}"
+        val coverArtSelectorUri = "http://localhost:${serverProperties.port}/ca/${slot}"
         openUriOnOperatingSystem(coverArtSelectorUri)
     }
 }

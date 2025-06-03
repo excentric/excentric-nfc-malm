@@ -3,16 +3,10 @@ spring:
     web-application-type: servlet
   shell:
     noninteractive.enabled: false
+    config:
+      location: ${user.home}/.malm
 server:
   port: 8062
-
-#logging:
-#  level:
-#    com.excentric.client.LoggingInterceptor: DEBUG
-#  file:
-#    name: logs/rest-client.log
-#  pattern:
-#    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 music-album-label-maker:
   api.user-agent: "MusicAlbumLabelMaker/0.0.1 (nfc-sonos@excentric.com)"
@@ -22,3 +16,11 @@ music-album-label-maker:
   cover-art-archive.url: https://coverartarchive.org/
   metadata-directory: ${user.home}/.malm/metadata
   pdf-directory: ${user.home}/.malm/pdfs
+
+#logging:
+#  level:
+#    com.excentric.client.LoggingInterceptor: DEBUG
+#  file:
+#    name: ${user.home}/.malm/rest-client.log
+#  pattern:
+#    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
