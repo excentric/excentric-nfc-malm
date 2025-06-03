@@ -1,8 +1,8 @@
 package com.excentric.malm.client
 
+import com.excentric.malm.config.CoverArtProperties
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.model.CoverArtResponseModel
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -12,8 +12,7 @@ import java.util.Locale.getDefault
 
 @Component
 class CoverArtArchiveClient(
-    @Value("\${music-album-label-maker.cover-art-archive.url}")
-    private val coverArtArchiveApiUrl: String
+    private val coverArtProperties: CoverArtProperties
 ) : AbstractClient() {
     fun downloadCoverArt(mbid: String): File? {
         try {
@@ -61,5 +60,5 @@ class CoverArtArchiveClient(
         }
     }
 
-    private fun getImageMetadataApiUrl(mbid: String) = "${coverArtArchiveApiUrl}release/$mbid"
+    private fun getImageMetadataApiUrl(mbid: String) = "${coverArtProperties.url}release/$mbid"
 }

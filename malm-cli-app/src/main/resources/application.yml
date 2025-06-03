@@ -13,7 +13,9 @@ music-album-label-maker:
   musicbrainz:
     api.url: https://musicbrainz.org/ws/2/
     release-year-covers-only: true
-  cover-art-archive.url: https://coverartarchive.org/
+  cover-art-archive:
+    url: https://coverartarchive.org/
+    thread-count: 8
   metadata-directory: ${user.home}/.malm/metadata
   pdf-directory: ${user.home}/.malm/pdfs
 

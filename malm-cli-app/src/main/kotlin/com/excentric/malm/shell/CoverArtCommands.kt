@@ -1,6 +1,7 @@
 package com.excentric.malm.shell
 
 import com.excentric.malm.client.CoverArtArchiveClient
+import com.excentric.malm.config.CoverArtProperties
 import com.excentric.malm.config.ServerProperties
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.storage.MetadataStorage
@@ -12,12 +13,17 @@ import org.springframework.shell.component.support.SelectorItem
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
+import java.io.File
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 @ShellComponent
 class CoverArtCommands(
     private val coverArtArchiveClient: CoverArtArchiveClient,
     private val metadataStorage: MetadataStorage,
     private val serverProperties: ServerProperties,
+    private val coverArtProperties: CoverArtProperties,
 ) : AbstractShellCommands() {
     override val logger: Logger = LoggerFactory.getLogger(CoverArtCommands::class.java)
 
@@ -36,21 +42,49 @@ class CoverArtCommands(
             val totalDownloads = slotsMap.flatMap { it.value.mbids }.size
             var completedAttempts = 0
 
+            val startTime = System.currentTimeMillis()
             startProgressBar(totalDownloads)
 
+            // Create a list of all download tasks
+            val downloadTasks = mutableListOf<Triple<Int, Int, String>>()
             slotsMap.forEach { (slot, albumMetadata) ->
-                albumMetadata.mbids.forEachIndexed { index: Int, mbid: String ->
-                    coverArtArchiveClient.downloadCoverArt(mbid)?.let { coverArtFile ->
-                        metadataStorage.saveCoverArt(slot, index, coverArtFile)
+                albumMetadata.mbids.forEachIndexed { index, mbid ->
+                    downloadTasks.add(Triple(slot, index, mbid))
+                }
+            }
+
+            // Process downloads in parallel with a configurable thread count
+            val executor = Executors.newFixedThreadPool(coverArtProperties.threadCount)
+            try {
+                // Submit all tasks to the executor
+                val futures = downloadTasks.map { (slot, index, mbid) ->
+                    executor.submit(Callable {
+                        val coverArtFile = coverArtArchiveClient.downloadCoverArt(mbid)
+                        Triple(slot, index, coverArtFile)
+                    })
+                }
+
+                // Process results as they complete
+                for (future in futures) {
+                    val (slot, index, coverArtFile) = future.get()
+                    coverArtFile?.let { file ->
+                        metadataStorage.saveCoverArt(slot, index, file)
                     }
                     completedAttempts++
                     updateProgressBar(completedAttempts, totalDownloads)
                 }
+            } finally {
+                executor.shutdown()
             }
+
             finishProgressBar()
 
+            val endTime = System.currentTimeMillis()
+            val elapsedTimeMs = endTime - startTime
+            val elapsedTimeSec = elapsedTimeMs / 1000.0
+
             val totalDownloaded = slotsMap.keys.flatMap { metadataStorage.getPotentialCoverArtsFiles(it) }.size
-            logger.info("Downloaded $totalDownloaded cover art images for ${slotsMap.keys.count()} slot(s)")
+            logger.info("Downloaded $totalDownloaded cover art images for ${slotsMap.keys.count()} slot(s) in ${String.format("%.2f", elapsedTimeSec)} seconds")
         }
     }
 
