@@ -1,28 +1,30 @@
 import com.github.gradle.node.npm.task.NpmTask
 
-// Apply the base plugin and node plugin
 plugins {
     base
     id("com.github.node-gradle.node") version "7.0.1"
 }
 
-// Configure the node plugin
 node {
-    // Set the version of Node.js to use
     version.set("21.6.2")
-    // Download node using the plugin
+    npmVersion = ""
+    yarnVersion = ""
+
     download.set(true)
-    // Set the working directory for node tasks
-    workDir.set(file("${project.buildDir}/nodejs"))
-    // Set the directory for npm packages
-    npmWorkDir.set(file("${project.buildDir}/npm"))
-    // Set the directory for yarn packages (if used)
-    yarnWorkDir.set(file("${project.buildDir}/yarn"))
+    workDir = file("${rootProject.projectDir}/.gradle/nodejs")
+    npmWorkDir = file("${rootProject.projectDir}/.gradle/npm")
+    yarnWorkDir = file("${rootProject.projectDir}/.gradle/yarn")
+}
+
+tasks.register<NpmTask>("rebuild") {
+    description = "Rebuilds"
+    args.set(listOf("rebuild"))
 }
 
 // Task to install npm dependencies
 tasks.npmInstall {
     description = "Install Node.js dependencies"
+    dependsOn("rebuild")
 }
 
 // Task to build TypeScript code
@@ -30,13 +32,6 @@ tasks.register<NpmTask>("buildTypeScript") {
     description = "Build TypeScript code"
     args.set(listOf("run", "build"))
     dependsOn(tasks.npmInstall)
-}
-
-// Task to run the application
-tasks.register<NpmTask>("runApp") {
-    description = "Run the application"
-    args.set(listOf("run", "start"))
-    dependsOn("buildTypeScript")
 }
 
 // Task to run the read-tag script

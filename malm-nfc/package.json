@@ -6,7 +6,6 @@
     "read-tag": "tsc && node dist/read-tag.js",
     "write-tag": "tsc && node dist/write-tag.js",
     "build": "tsc",
-    "start": "node dist/index.js",
     "dev": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

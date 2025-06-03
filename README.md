@@ -25,6 +25,7 @@ This project enables you to:
 - NFC reader/writer hardware
 - Sonos HTTP API running on a host named "bb" (or configure in settings)
 - Avery 80x50 rectangle labels (for printing)
+- GraalVM (optional, for native image compilation)
 
 ### Building the Project
 
@@ -34,6 +35,14 @@ This project uses [Gradle](https://gradle.org/).
 * Run `./gradlew build` to build and run tests
 * Run `./gradlew run` to build and run the CLI application
 
+#### Native Image Support
+
+The CLI application can be compiled to a native binary using GraalVM, which provides faster startup times and reduced memory usage:
+
+* Run `./build-native.sh` to build a native binary
+* The native binary will be created at `./malm-cli-app/build/native/nativeCompile/malm-cli-app`
+* The `cli-app.sh` script will automatically use the native binary if available
+
 ## Usage
 
 ### CLI Application
@@ -42,6 +51,8 @@ Run the CLI application:
 ```
 ./cli-app.sh
 ```
+
+This script will automatically use the native binary if it has been built, providing faster startup times. If the native binary is not available, it will fall back to using the JAR file.
 
 The CLI application provides the following commands:
 

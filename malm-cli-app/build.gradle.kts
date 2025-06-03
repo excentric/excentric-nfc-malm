@@ -4,6 +4,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.4"
     alias(libs.plugins.kotlinPluginSerialization)
     application
+    id("org.graalvm.buildtools.native") version "0.9.28"
 }
 
 dependencies {
@@ -28,4 +29,20 @@ dependencies {
 
 application {
     mainClass = "com.excentric.malm.MalmApplicationKt"
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName = "malm-cli-app"
+            mainClass = "com.excentric.malm.MalmApplicationKt"
+            buildArgs.add("--verbose")
+            buildArgs.add("--no-fallback")
+            buildArgs.add("-H:+ReportExceptionStackTraces")
+            // Enable reflection for Spring Boot
+            buildArgs.add("-H:+AddAllCharsets")
+            buildArgs.add("-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json")
+            buildArgs.add("-H:ResourceConfigurationFiles=src/main/resources/META-INF/native-image/resource-config.json")
+        }
+    }
 }

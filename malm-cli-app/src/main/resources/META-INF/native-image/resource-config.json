@@ -1,0 +1,55 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": ".*\\.properties"
+      },
+      {
+        "pattern": ".*\\.yml"
+      },
+      {
+        "pattern": ".*\\.yaml"
+      },
+      {
+        "pattern": ".*\\.xml"
+      },
+      {
+        "pattern": ".*\\.txt"
+      },
+      {
+        "pattern": "META-INF/spring.factories"
+      },
+      {
+        "pattern": "META-INF/spring/.*"
+      },
+      {
+        "pattern": "templates/.*"
+      },
+      {
+        "pattern": "static/.*"
+      },
+      {
+        "pattern": "banner.txt"
+      },
+      {
+        "pattern": "application.yml"
+      },
+      {
+        "pattern": "application.yaml"
+      },
+      {
+        "pattern": "application.properties"
+      },
+      {
+        "pattern": "application-.*\\.yml"
+      },
+      {
+        "pattern": "application-.*\\.yaml"
+      },
+      {
+        "pattern": "application-.*\\.properties"
+      }
+    ]
+  },
+  "bundles": []
+}
