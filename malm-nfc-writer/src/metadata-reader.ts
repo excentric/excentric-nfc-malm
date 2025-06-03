@@ -8,6 +8,7 @@ export interface AlbumMetadata {
     artist?: string;
     year?: number;
     appleMusicAlbumId?: string;
+    slot?: string;
 }
 
 // Function to read all metadata files
@@ -32,11 +33,7 @@ export function readAllMetadataFiles(): AlbumMetadata[] {
             const filePath = path.join(metadataDir, file);
             const fileContent = fs.readFileSync(filePath, 'utf8');
             const metadata = JSON.parse(fileContent) as AlbumMetadata;
-
-            // Print filename without extension and title
-            const filenameWithoutExt = path.basename(file, '.json');
-            console.log(`${filenameWithoutExt}: ${metadata.artist} ${metadata.title} (${metadata.year})`);
-
+            metadata.slot = path.basename(file, '.json')
             metadataFiles.push(metadata);
         }
 

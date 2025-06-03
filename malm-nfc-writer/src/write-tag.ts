@@ -1,21 +1,35 @@
 import {NDEFMessage, NFC, NFCCard, nfcCard, NFCReader} from "./nfc-common";
-import {readAllMetadataFiles} from "./metadata-reader";
+import {AlbumMetadata, readAllMetadataFiles} from "./metadata-reader";
 
 const nfc = new NFC();
+
+function getColouredAlbumDetails(currentAlbum: AlbumMetadata) {
+    return `\x1b[32m${currentAlbum.artist}\x1b[0m - \x1b[32m${currentAlbum.title}\x1b[0m (\x1b[32m${currentAlbum.year}\x1b[0m)`
+}
+
+function logWaitingToWrite() {
+    console.log(`Present card to write: ${getColouredAlbumDetails(currentAlbum)}`);
+}
+
 
 // Read all metadata files before starting NFC operations
 const albums = readAllMetadataFiles();
 
+for (const album of albums) {
+    console.log(`${album.slot}: ${getColouredAlbumDetails(album)}`);
+}
+
 let currentAlbumIndex = 0;
 let currentAlbum = albums[currentAlbumIndex];
 
-function logWaitingToWrite() {
-    console.log(`Waiting to write: ${currentAlbum.artist} - ${currentAlbum.title}`);
-}
 
 nfc.on('reader', (reader: NFCReader) => {
 
+    console.log("");
+    console.log(`****************************************`);
     console.log(`${reader.reader.name} device attached`);
+    console.log(`****************************************`);
+    console.log("");
 
     logWaitingToWrite();
 
@@ -26,7 +40,7 @@ nfc.on('reader', (reader: NFCReader) => {
             const tag = nfcCard.parseInfo(cardHeader);
 
             const message: NDEFMessage[] = [
-                {type: 'text', text: 'applemusic/now/album:1673857120', language: 'en'},
+                {type: 'text', text: `applemusic/now/album:${currentAlbum.appleMusicAlbumId}`, language: 'en'},
             ];
 
             // Prepare the buffer to write on the card
