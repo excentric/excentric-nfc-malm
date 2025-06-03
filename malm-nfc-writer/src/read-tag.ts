@@ -1,5 +1,6 @@
 import {makeSonosRequest} from "./sonos-api-client";
 import {getGreenText, getRedText, logReaderAttached, NDEFMessage, NFC, NFCCard, nfcCard, NFCReader} from "./nfc-common";
+import settings from "./settings";
 
 const nfc = new NFC();
 
@@ -15,9 +16,11 @@ nfc.on('reader', (reader: NFCReader) => {
                 const NDEFRawMessage: Buffer = await reader.read(4, nfcCard.getNDEFMessageLengthToRead()); // starts reading in block 0 until 6
                 const NDEFMessage: NDEFMessage[] = nfcCard.parseNDEF(NDEFRawMessage);
 
-                console.log(`Detected Sonos Command: ${getGreenText(NDEFMessage[0].text)}`,);
+                let sonosCommand = NDEFMessage[0].text;
+                console.log(`Detected Sonos Command: ${getGreenText(sonosCommand)}`,);
 
-                makeSonosRequest(NDEFMessage[0].text)
+                makeSonosRequest(sonosCommand, settings.sonosRoom)
+
             } else {
                 console.log('Could not parse anything from this tag: \n The tag is either empty, locked, has a wrong NDEF format or is unreadable.');
             }

@@ -1,0 +1,23 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
+interface Settings {
+    sonosRoom: string;
+}
+
+// Load settings from the settings.json file
+const settingsPath = path.resolve(__dirname, '../settings.json');
+let settings: Settings;
+
+try {
+    const settingsData = fs.readFileSync(settingsPath, 'utf8');
+    settings = JSON.parse(settingsData);
+} catch (error) {
+    console.error('Error loading settings:', error);
+    // Fallback to default settings if file can't be read
+    settings = {
+        sonosRoom: 'Playroom Sonos'
+    };
+}
+
+export default settings;

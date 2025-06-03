@@ -1,8 +1,9 @@
 import * as http from 'http';
 import {getGreenText} from "./nfc-common";
 
-export function makeSonosRequest(sonosRequest: string, successCallback?: () => void): void {
-    let path = '/' + encodeURIComponent('Playroom Sonos') + '/' + sonosRequest;
+export function makeSonosRequest(sonosRequest: string, zone: string, successCallback?: () => void): void {
+
+    let path = '/' + encodeURIComponent(zone) + '/' + sonosRequest;
 
     const options = {
         hostname: 'bb',
@@ -13,16 +14,16 @@ export function makeSonosRequest(sonosRequest: string, successCallback?: () => v
 
     console.log(`Making request to GET http://${options.hostname}:${options.port}/${path}`)
 
-    const request = http.request(options, (res) => {
-        console.log(`Status Code: ${getGreenText(res.statusCode?.toString())}\n`);
+    const request = http.request(options, (result) => {
+        console.log(`Status Code: ${getGreenText(result.statusCode?.toString())}\n`);
 
         let data = '';
 
-        res.on('data', (chunk) => {
+        result.on('data', (chunk) => {
             data += chunk;
         });
 
-        res.on('end', () => {
+        result.on('end', () => {
             // console.log('Response:');
             // console.log(data);
 
