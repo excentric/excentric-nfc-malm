@@ -1,10 +1,5 @@
-/**
- * HTTP GET request example
- */
-
 import * as http from 'http';
 
-// Function to make a GET request
 export function makeSonosRequest(sonosRequest: string, successCallback?: () => void): void {
     const options = {
         hostname: 'bb',

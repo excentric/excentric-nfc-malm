@@ -1,7 +1,5 @@
-import {makeSonosRequest} from "./index";
-import {NFC, nfcCard, NFCReader, NFCCard, NDEFMessage} from "./nfc-common";
-
-const http = require('http');
+import {makeSonosRequest} from "./sonos-api-client";
+import {NDEFMessage, NFC, NFCCard, nfcCard, NFCReader} from "./nfc-common";
 
 const nfc = new NFC();
 
