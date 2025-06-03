@@ -12,7 +12,7 @@ class SlotPositionDetails(row: Int, column: Int) {
     val yearBottom: Float = ORIGIN_PARAGRAPH_BOTTOM - row * ROW_OFFSET
 
     companion object {
-        const val ROW_OFFSET = 156f
+        const val ROW_OFFSET = 156.8f
         const val COLUMN_OFFSET = 270f
         const val PARAGRAPH_OFFSET = 26f
 

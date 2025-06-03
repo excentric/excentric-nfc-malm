@@ -14,6 +14,6 @@ include(":malm-cli-app")
 include(":malm-metadata")
 include(":malm-pdf")
 
-include(":malm-nfc-writer")
+include(":malm-nfc")
 
 rootProject.name = "excentric-nfc-sonos"

@@ -1,3 +1,3 @@
-cd malm-nfc-writer
+cd malm-nfc
 npm run read-tag
 cd ../
