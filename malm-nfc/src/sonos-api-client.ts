@@ -1,13 +1,14 @@
 import * as http from 'http';
 import {getGreenText} from "./nfc-common";
+import settings from "./settings";
 
 export function makeSonosRequest(sonosRequest: string, zone: string, successCallback?: () => void): Promise<void> {
     return new Promise((resolve, reject) => {
         let path = '/' + encodeURIComponent(zone) + '/' + sonosRequest;
 
         const options = {
-            hostname: 'bb',
-            port: 5005,
+            hostname: settings.sonosApi.hostname,
+            port: settings.sonosApi?.port || 5005,
             path: path,
             method: 'GET'
         };

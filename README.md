@@ -23,7 +23,7 @@ This project enables you to:
 - Java 11 or higher
 - Node.js and npm (for NFC functionality)
 - NFC reader/writer hardware
-- Sonos HTTP API running on a host named "bb" (or configure in settings)
+- Sonos HTTP API running on a host named "sonos-client" (or configure in settings)
 - Avery 80x50 rectangle labels (for printing)
 - GraalVM (optional, for native image compilation)
 

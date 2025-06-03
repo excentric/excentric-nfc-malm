@@ -1,3 +1,7 @@
 {
-  "sonosRoom": "Playroom Sonos"
+  "sonosRoom": "Playroom Sonos",
+  "sonosApi": {
+    "hostname": "sonos-api",
+    "port": 5005
+  }
 }

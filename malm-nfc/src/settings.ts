@@ -3,6 +3,10 @@ import * as path from 'path';
 
 interface Settings {
     sonosRoom: string;
+    sonosApi: {
+        hostname: string;
+        port: number;
+    };
 }
 
 // Load settings from the settings.json file
@@ -16,7 +20,11 @@ try {
     console.error('Error loading settings:', error);
     // Fallback to default settings if file can't be read
     settings = {
-        sonosRoom: 'Playroom Sonos'
+        sonosRoom: 'Playroom Sonos',
+        sonosApi: {
+            hostname: 'sonos-api',
+            port: 5005
+        }
     };
 }
 
