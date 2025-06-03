@@ -2,6 +2,7 @@ package com.excentric.malm.storage
 
 import com.excentric.malm.errors.MalmException
 import com.excentric.malm.metadata.AlbumMetadata
+import com.excentric.malm.util.ConsoleColors.green
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -25,6 +26,15 @@ class MetadataStorage(
 
     var albumMetadata: AlbumMetadata? = null
 
+    fun saveToNextAvailableSlot(albumMetadata: AlbumMetadata) {
+        this.albumMetadata = albumMetadata
+        val slot = findNextAvailableSlot()
+        if (slot == null) {
+            logger.warn("No free slots!")
+        } else
+            saveToSlot(slot)
+    }
+
     fun saveToSlot(slot: Int) {
         val metadata = albumMetadata
 
@@ -33,7 +43,7 @@ class MetadataStorage(
         return try {
             val metadataFile = getMetadataFile(slot)
             objectMapper.writeValue(metadataFile, metadata)
-            logger.info("Successfully saved album metadata to slot $slot")
+            logger.info("Successfully saved album metadata to slot ${green(slot.toString())}")
         } catch (e: Exception) {
             throw MalmException("Failed to save album metadata to slot $slot: ${e.message}")
         }
@@ -176,5 +186,15 @@ class MetadataStorage(
             }
             return@mapNotNull null
         }
+    }
+
+    private fun findNextAvailableSlot(): Int? {
+        val occupiedSlots = getSlotsMap().keys
+        for (slot in 1..99) {
+            if (slot !in occupiedSlots) {
+                return slot
+            }
+        }
+        return null
     }
 }

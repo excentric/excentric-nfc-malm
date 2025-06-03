@@ -37,7 +37,7 @@ class CoverArtCommands(
             val totalDownloads = slotsMap.flatMap { it.value.mbids }.size
             var completedAttempts = 0
 
-            startProgressBar()
+            startProgressBar(totalDownloads)
 
             slotsMap.forEach { (slot, albumMetadata) ->
                 albumMetadata.mbids.forEachIndexed { index: Int, mbid: String ->

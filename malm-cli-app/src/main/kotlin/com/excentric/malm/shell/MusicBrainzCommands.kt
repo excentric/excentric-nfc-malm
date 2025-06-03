@@ -79,16 +79,8 @@ class MusicBrainzCommands(
             val release = releaseGroups[context.resultItem.get().item.toInt()]
 
             val albumMetadata = AlbumMetadata(release.releases?.map { it.id }.orEmpty(), release.title, artist.name, release.getYear())
-            metadataStorage.albumMetadata = albumMetadata
             logAlbumResult(albumMetadata)
-
-//            releaseGroups.forEachIndexed { index, releaseGroup ->
-//                val releaseDate = releaseGroup.firstReleaseDate ?: "Unknown date"
-//                val releaseTitle = releaseGroup.title
-//                val type = if (albumsOnly) "" else "[${releaseGroup.primaryType} ${releaseGroup.secondaryTypes?.joinToString(", ").orEmpty()}]"
-//
-//                logger.info("${index + 1}. $releaseTitle $type($releaseDate)")
-//            }
+            metadataStorage.saveToNextAvailableSlot(albumMetadata)
         }
     }
 

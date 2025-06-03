@@ -28,8 +28,8 @@ abstract class AbstractShellCommands {
 
     }
 
-    protected fun startProgressBar() {
-        terminal.writer().print("\r[                    ] 0%")
+    protected fun startProgressBar(totalDownloads: Int) {
+        terminal.writer().print("\r[                    ] 0% [0/$totalDownloads]")
         terminal.writer().flush()
     }
 

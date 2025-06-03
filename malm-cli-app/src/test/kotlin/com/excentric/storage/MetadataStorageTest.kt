@@ -82,4 +82,34 @@ class MetadataStorageTest {
         assertEquals("Second Artist", foundSecondAlbum?.artist)
         assertEquals(2022, foundSecondAlbum?.year)
     }
+
+    @Test
+    fun `findNextAvailableSlot should return the first available slot`() {
+        // Given no slots are occupied
+        // When
+        val nextSlot = metadataStorage.findNextAvailableSlot()
+        // Then
+        assertEquals(1, nextSlot)
+
+        // Given slot 1 is occupied
+        metadataStorage.saveToSlot(1)
+        // When
+        val nextSlotAfterOne = metadataStorage.findNextAvailableSlot()
+        // Then
+        assertEquals(2, nextSlotAfterOne)
+
+        // Given slots 1 and 3 are occupied (non-sequential)
+        metadataStorage.saveToSlot(3)
+        // When
+        val nextSlotAfterOneAndThree = metadataStorage.findNextAvailableSlot()
+        // Then
+        assertEquals(2, nextSlotAfterOneAndThree)
+
+        // Given slots 1, 2, and 3 are occupied
+        metadataStorage.saveToSlot(2)
+        // When
+        val nextSlotAfterOneToThree = metadataStorage.findNextAvailableSlot()
+        // Then
+        assertEquals(4, nextSlotAfterOneToThree)
+    }
 }
