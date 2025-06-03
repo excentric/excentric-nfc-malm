@@ -5,5 +5,8 @@ spring:
     log:
       enabled: false
 
+server:
+  port: 8063
+
 music-album-label-maker:
   metadata-directory: ${user.home}/.album-metadata

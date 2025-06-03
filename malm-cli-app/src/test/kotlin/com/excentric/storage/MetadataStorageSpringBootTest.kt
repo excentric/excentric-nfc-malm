@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest(classes = [MalmApplication::class])
+@SpringBootTest(classes = [MalmApplication::class], properties = ["spring.profiles.active=test"])
 class MetadataStorageSpringBootTest {
     private val logger = LoggerFactory.getLogger(MetadataStorageSpringBootTest::class.java)
 
