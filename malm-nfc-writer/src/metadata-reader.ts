@@ -17,7 +17,6 @@ export function readAllMetadataFiles(): AlbumMetadata[] {
     const metadataFiles: AlbumMetadata[] = [];
 
     try {
-        // Check if directory exists
         if (!fs.existsSync(metadataDir)) {
             console.error(`Metadata directory does not exist: ${metadataDir}`);
             return [];

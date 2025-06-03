@@ -1,23 +1,30 @@
-import {NFC, nfcCard, NFCReader, NFCCard, NDEFMessage} from "./nfc-common";
-import {AlbumMetadata, readAllMetadataFiles} from "./metadata-reader";
+import {NDEFMessage, NFC, NFCCard, nfcCard, NFCReader} from "./nfc-common";
+import {readAllMetadataFiles} from "./metadata-reader";
 
 const nfc = new NFC();
 
 // Read all metadata files before starting NFC operations
-const allMetadata = readAllMetadataFiles();
+const albums = readAllMetadataFiles();
+
+let currentAlbumIndex = 0;
+let currentAlbum = albums[currentAlbumIndex];
+
+function logWaitingToWrite() {
+    console.log(`Waiting to write: ${currentAlbum.artist} - ${currentAlbum.title}`);
+}
 
 nfc.on('reader', (reader: NFCReader) => {
 
     console.log(`${reader.reader.name} device attached`);
 
+    logWaitingToWrite();
+
     reader.on('card', async (card: NFCCard) => {
-
-        console.log(`card detected`, card);
-
         try {
             const cardHeader: Buffer = await reader.read(0, 20);
 
             const tag = nfcCard.parseInfo(cardHeader);
+
             const message: NDEFMessage[] = [
                 {type: 'text', text: 'applemusic/now/album:1673857120', language: 'en'},
             ];
@@ -28,28 +35,33 @@ nfc.on('reader', (reader: NFCReader) => {
             // Write the buffer on the card starting at block 4
             const preparationWrite: boolean = await reader.write(4, rawDataToWrite.preparedData);
 
-            // Success !
             if (preparationWrite) {
-                console.log('Data have been written successfully.');
-                process.exit(0); // Exit the process after successful write
+                currentAlbumIndex++;
+                currentAlbum = albums[currentAlbumIndex];
+                if (currentAlbumIndex == albums.length) {
+                    console.log('All Albums have been written successfully.');
+                    process.exit(0);
+                }
             }
 
+            logWaitingToWrite();
+
         } catch (err: unknown) {
-            console.error(`error when reading data`, err);
-            process.exit(1); // Exit with error code
+            console.error(`error when reading data. we'll try again...`, err);
+            logWaitingToWrite();
         }
     });
 
     reader.on('card.off', (card: NFCCard) => {
-        console.log(`${reader.reader.name} card removed`, card);
+        // console.log(`${reader.reader.name} card removed`, card);
     });
 
     reader.on('error', (err: Error) => {
-        console.log(`${reader.reader.name} an error occurred`, err);
+        // console.log(`${reader.reader.name} an error occurred`, err);
     });
 
     reader.on('end', () => {
-        console.log(`${reader.reader.name} device removed`);
+        // console.log(`${reader.reader.name} device removed`);
     });
 
 });
