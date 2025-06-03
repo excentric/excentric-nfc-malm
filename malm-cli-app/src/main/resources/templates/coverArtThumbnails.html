@@ -22,6 +22,10 @@
          th:src="@{'/ca/' + ${slot} + '/image/' + ${index}}"
          th:onclick="'openModal(\'/ca/' + ${slot} + '/image/' + ${index} + '\')'"
          alt="Cover Art Image"/>
+    <div class="image-info" th:with="metadata=${imageMetadataMap.get(index)}">
+      <span th:text="${metadata.sizeKB} + ' KB'"></span>
+      <span th:text="${metadata.width} + ' x ' + ${metadata.height}"></span>
+    </div>
     <a href="#" th:if="${index != selectedCoverArtIndex}" th:onclick="'selectAndClose(\'/ca/' + ${slot} + '/select/' + ${index} + '\')'" class="select-link">Select</a>
     <span th:if="${index == selectedCoverArtIndex}" class="selected-text">Cover</span>
   </div>

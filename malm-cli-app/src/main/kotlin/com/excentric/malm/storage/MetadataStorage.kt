@@ -8,6 +8,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.io.File
+import javax.imageio.ImageIO
+import kotlin.math.roundToInt
+
+data class ImageMetadata(
+    val sizeKB: Int,
+    val width: Int,
+    val height: Int
+)
 
 @Component
 class MetadataStorage(
@@ -210,6 +218,16 @@ class MetadataStorage(
         }
 
         return null
+    }
+
+    fun getImageMetadata(file: File): ImageMetadata {
+        val sizeKB = (file.length() / 1024.0).roundToInt()
+
+        val bufferedImage = ImageIO.read(file)
+        val width = bufferedImage.width
+        val height = bufferedImage.height
+
+        return ImageMetadata(sizeKB, width, height)
     }
 
     private fun findNextAvailableSlot(): Int? {
