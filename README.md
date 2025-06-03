@@ -1,4 +1,4 @@
-# excentric-nfc-sonos
+# Music Album Label Maker for controlling Sonos systems with NFC
 
 A multi-module project that allows you to control Sonos speakers using NFC tags. The project consists of several components:
 

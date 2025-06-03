@@ -16,4 +16,4 @@ include(":malm-pdf")
 
 include(":malm-nfc")
 
-rootProject.name = "excentric-nfc-sonos"
+rootProject.name = "excentric-nfc-malm"

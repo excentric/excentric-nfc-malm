@@ -35,6 +35,9 @@ nfc.on('reader', (reader: NFCReader) => {
             const message: NDEFMessage[] = [
                 {type: 'text', text: `applemusic/now/album:${currentAlbum.appleMusicAlbumId}`, language: 'en'},
                 // {type: 'text', text: `playpause`, language: 'en'},
+                // {type: 'text', text: `next`, language: 'en'},
+                // {type: 'text', text: `groupVolume+5`, language: 'en'},
+                // {type: 'text', text: `groupVolume-5`, language: 'en'},
             ];
 
             // Prepare the buffer to write on the card
