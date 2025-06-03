@@ -1,29 +1,7 @@
 import {makeSonosRequest} from "./index";
+import {NFC, nfcCard, NFCReader, NFCCard, NDEFMessage} from "./nfc-common";
 
-const {NFC} = require('nfc-pcsc');
-const nfcCard = require('nfccard-tool');
 const http = require('http');
-
-// Define types for the objects we're using
-type NFCReader = {
-    reader: {
-        name: string;
-    };
-    read(blockNumber: number, length: number, blockSize?: number, packetSize?: number, readClass?: number): Promise<Buffer>;
-    on(event: string, listener: (...args: any[]) => void): void;
-};
-
-type NFCCard = {
-    atr: Buffer;
-    standard: string;
-    type: string;
-    uid: string;
-};
-
-type NDEFMessage = {
-    text: string;
-    [key: string]: any;
-}
 
 const nfc = new NFC();
 

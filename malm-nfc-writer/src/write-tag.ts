@@ -1,29 +1,4 @@
-const {NFC} = require('nfc-pcsc');
-const nfcCard = require('nfccard-tool');
-
-// Define types for the objects we're using
-type NFCReader = {
-    reader: {
-        name: string;
-    };
-    read(blockNumber: number, length: number, blockSize?: number, packetSize?: number, readClass?: number): Promise<Buffer>;
-    write(blockNumber: number, data: Buffer, blockSize?: number, packetSize?: number): Promise<boolean>;
-    on(event: string, listener: (...args: any[]) => void): void;
-};
-
-type NFCCard = {
-    atr: Buffer;
-    standard: string;
-    type: string;
-    uid: string;
-};
-
-type NDEFMessage = {
-    type: string;
-    text: string;
-    language: string;
-    [key: string]: any;
-}
+import {NFC, nfcCard, NFCReader, NFCCard, NDEFMessage} from "./nfc-common";
 
 const nfc = new NFC();
 
