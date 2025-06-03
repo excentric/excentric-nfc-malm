@@ -1,16 +1,15 @@
-import {NDEFMessage, NFC, NFCCard, nfcCard, NFCReader} from "./nfc-common";
+import {NDEFMessage, NFC, NFCCard, nfcCard, NFCReader, logReaderAttached, getGreenText} from "./nfc-common";
 import {AlbumMetadata, readAllMetadataFiles} from "./metadata-reader";
 
 const nfc = new NFC();
 
 function getColouredAlbumDetails(currentAlbum: AlbumMetadata) {
-    return `\x1b[32m${currentAlbum.artist}\x1b[0m - \x1b[32m${currentAlbum.title}\x1b[0m (\x1b[32m${currentAlbum.year}\x1b[0m)`
+    return `${getGreenText(currentAlbum.artist)} - \x1b[32m${currentAlbum.title}\x1b[0m (\x1b[32m${currentAlbum.year}\x1b[0m)`
 }
 
 function logWaitingToWrite() {
     console.log(`Present card to write: ${getColouredAlbumDetails(currentAlbum)}`);
 }
-
 
 // Read all metadata files before starting NFC operations
 const albums = readAllMetadataFiles();
@@ -22,14 +21,8 @@ for (const album of albums) {
 let currentAlbumIndex = 0;
 let currentAlbum = albums[currentAlbumIndex];
 
-
 nfc.on('reader', (reader: NFCReader) => {
-
-    console.log("");
-    console.log(`****************************************`);
-    console.log(`${reader.reader.name} device attached`);
-    console.log(`****************************************`);
-    console.log("");
+    logReaderAttached(reader);
 
     logWaitingToWrite();
 
@@ -61,7 +54,7 @@ nfc.on('reader', (reader: NFCReader) => {
             logWaitingToWrite();
 
         } catch (err: unknown) {
-            console.error(`error when reading data. we'll try again...`, err);
+            console.error(`error when writing data. we'll try again...`, err);
             logWaitingToWrite();
         }
     });
