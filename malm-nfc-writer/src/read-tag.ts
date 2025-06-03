@@ -19,7 +19,12 @@ nfc.on('reader', (reader: NFCReader) => {
                 let sonosCommand = NDEFMessage[0].text;
                 console.log(`Detected Sonos Command: ${getGreenText(sonosCommand)}`,);
 
-                makeSonosRequest(sonosCommand, settings.sonosRoom)
+                console.log(`Clearing Sonos Queue`,);
+                await makeSonosRequest("clearqueue", settings.sonosRoom);
+
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                await makeSonosRequest(sonosCommand, settings.sonosRoom);
 
             } else {
                 console.log('Could not parse anything from this tag: \n The tag is either empty, locked, has a wrong NDEF format or is unreadable.');
