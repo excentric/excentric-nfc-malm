@@ -1,3 +1,3 @@
 cd malm-nfc
-npm run write-tag
+npm run write-tag -- "$@"
 cd ../

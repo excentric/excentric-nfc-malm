@@ -3,34 +3,100 @@ import {AlbumMetadata, readAllMetadataFiles} from "./metadata-reader";
 
 const args = process.argv.slice(2);
 
+// Parse the first optional argument if provided
+let mode: string | undefined;
+let value: string;
 const nfc = new NFC();
+const albums = readAllMetadataFiles();
+let currentAlbumIndex = 0;
+
+
+if (args.length > 0) {
+    const arg = args[0];
+    const match = arg.match(/^([^:]+):(.+)$/);
+
+    if (!match) {
+        console.error('Error: First argument must be in the format "$mode:$value"');
+        process.exit(1);
+    }
+
+    mode = match[1];
+    value = match[2];
+}
+
+switch (mode) {
+    case "amid":
+        appleMusicIdMode()
+        break
+    case "action":
+        actionMode()
+        break
+    default:
+        albumMode()
+        break
+}
 
 function getColouredAlbumDetails(currentAlbum: AlbumMetadata) {
     return `${getGreenText(currentAlbum.artist)} - \x1b[32m${currentAlbum.title}\x1b[0m (\x1b[32m${currentAlbum.year}\x1b[0m)`
 }
 
-const albums = readAllMetadataFiles();
-let currentAlbumIndex = 0;
-
-for (const album of albums) {
-    console.log(`${album.slot}: ${getColouredAlbumDetails(album)}`);
+function getAppleMusicPlayNowAction(appleMusicAlbumId: string) {
+    return `applemusic/now/album:${appleMusicAlbumId}`;
 }
 
-startNfcWriter(
-    () => {
-        console.log(`Present card to write: ${getColouredAlbumDetails(albums[currentAlbumIndex])}`);
-    },
-    () => {
-        return `applemusic/now/album:${albums[currentAlbumIndex].appleMusicAlbumId}`
-    },
-    () => {
-        currentAlbumIndex++;
-        if (currentAlbumIndex == albums.length) {
-            console.log('All Albums have been written successfully.');
+
+function appleMusicIdMode() {
+    startNfcWriter(
+        () => {
+            console.log(`Present card to write action: ${getGreenText(getAppleMusicPlayNowAction(value))}`);
+        },
+        () => {
+            return value;
+        },
+        () => {
+            console.log('Action has been written successfully.');
             process.exit(0);
-        }
-    },
-);
+        },
+    );
+}
+
+function actionMode() {
+    startNfcWriter(
+        () => {
+            console.log(`Present card to write action: ${getGreenText(value)}`);
+        },
+        () => {
+            return value;
+        },
+        () => {
+            console.log('Action has been written successfully.');
+            process.exit(0);
+        },
+    );
+}
+
+function albumMode() {
+
+    for (const album of albums) {
+        console.log(`${album.slot}: ${getColouredAlbumDetails(album)}`);
+    }
+
+    startNfcWriter(
+        () => {
+            console.log(`Present card to write: ${getColouredAlbumDetails(albums[currentAlbumIndex])}`);
+        },
+        () => {
+            return getAppleMusicPlayNowAction(albums[currentAlbumIndex].appleMusicAlbumId || "")
+        },
+        () => {
+            currentAlbumIndex++;
+            if (currentAlbumIndex == albums.length) {
+                console.log('All Albums have been written successfully.');
+                process.exit(0);
+            }
+        },
+    );
+}
 
 function startNfcWriter(onWaitingForWrite: () => void, nfcText: () => string, onSuccess: () => void) {
     nfc.on('reader', (reader: NFCReader) => {
@@ -78,4 +144,3 @@ function startNfcWriter(onWaitingForWrite: () => void, nfcText: () => string, on
         console.log('an error occurred', err);
     });
 }
-
