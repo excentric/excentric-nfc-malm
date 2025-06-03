@@ -1,6 +1,5 @@
 package com.excentric.malm.controller
 
-import com.excentric.malm.storage.ImageMetadata
 import com.excentric.malm.storage.MetadataStorage
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -8,7 +7,10 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import java.io.File
 import java.io.FileNotFoundException
+import javax.imageio.ImageIO
+import kotlin.math.roundToInt
 
 @Controller
 class CoverArtController(
@@ -24,7 +26,7 @@ class CoverArtController(
         // Create a map of image index to image metadata
         val imageMetadataMap = coverArtFiles.associate { file ->
             val index = file.nameWithoutExtension.toInt()
-            val metadata = metadataStorage.getImageMetadata(file)
+            val metadata = getImageMetadata(file)
             index to metadata
         }
 
@@ -56,5 +58,15 @@ class CoverArtController(
         metadataStorage.selectCoverArt(slot, index)
         model.addAttribute("selectedCoverArtIndex", index)
         return "redirect:/ca/$slot"
+    }
+
+    fun getImageMetadata(file: File): ImageMetadata {
+        val sizeKB = (file.length() / 1024.0).roundToInt()
+
+        val bufferedImage = ImageIO.read(file)
+        val width = bufferedImage.width
+        val height = bufferedImage.height
+
+        return ImageMetadata(sizeKB, width, height)
     }
 }
