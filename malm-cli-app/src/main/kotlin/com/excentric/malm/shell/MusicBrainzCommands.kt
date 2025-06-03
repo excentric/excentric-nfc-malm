@@ -84,6 +84,7 @@ class MusicBrainzCommands(
             val slot = metadataStorage.saveToNextAvailableSlot(albumMetadata)
             if (slot != null) {
                 coverArtCommands.downloadArt(slot.toString())
+                coverArtCommands.openCoverArt(slot)
             }
         }
     }

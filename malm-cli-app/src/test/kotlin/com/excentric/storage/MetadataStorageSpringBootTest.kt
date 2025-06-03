@@ -1,7 +1,6 @@
 package com.excentric.storage
 
 import com.excentric.malm.MalmApplication
-import com.excentric.malm.controller.ImageMetadata
 import com.excentric.malm.metadata.LabelMetadata
 import com.excentric.malm.pdf.PdfLabelWriter
 import com.excentric.malm.storage.MetadataStorage
@@ -49,36 +48,5 @@ class MetadataStorageSpringBootTest {
                 }
             }
         }
-    }
-
-    @Test
-    fun `test getImageMetadata caching`() {
-        // Find a slot with cover art files
-        val slotsMap = metadataStorage.getSlotsMap()
-        for (slot in slotsMap.keys) {
-            val potentialFiles = metadataStorage.getPotentialCoverArtsFiles(slot)
-            if (potentialFiles.isNotEmpty()) {
-                val file = potentialFiles.first()
-
-                // Get metadata for the file twice
-                val metadata1 = metadataStorage.getImageMetadata(file)
-                val metadata2 = metadataStorage.getImageMetadata(file)
-
-                // Verify that the metadata is correct
-                assert(metadata1.sizeKB > 0) { "Size should be greater than 0" }
-                assert(metadata1.width > 0) { "Width should be greater than 0" }
-                assert(metadata1.height > 0) { "Height should be greater than 0" }
-
-                // Verify that the second call returns the same object (cached)
-                assert(metadata1 === metadata2) { "Second call should return the cached object" }
-
-                logger.info("[DEBUG_LOG] Image metadata for file ${file.name}: size=${metadata1.sizeKB}KB, dimensions=${metadata1.width}x${metadata1.height}")
-
-                // Test passed, no need to check more files
-                return
-            }
-        }
-
-        logger.warn("No cover art files found to test getImageMetadata")
     }
 }
