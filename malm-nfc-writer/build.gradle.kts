@@ -1,4 +1,4 @@
-// Simple Gradle build file for TypeScript project
+import com.github.gradle.node.npm.task.NpmTask
 
 // Apply the base plugin and node plugin
 plugins {
@@ -26,28 +26,34 @@ tasks.npmInstall {
 }
 
 // Task to build TypeScript code
-tasks.register<com.github.gradle.node.npm.task.NpmTask>("buildTypeScript") {
+tasks.register<NpmTask>("buildTypeScript") {
     description = "Build TypeScript code"
     args.set(listOf("run", "build"))
     dependsOn(tasks.npmInstall)
 }
 
 // Task to run the application
-tasks.register<com.github.gradle.node.npm.task.NpmTask>("runApp") {
+tasks.register<NpmTask>("runApp") {
     description = "Run the application"
     args.set(listOf("run", "start"))
     dependsOn("buildTypeScript")
 }
 
 // Task to run the read-tag script
-tasks.register<com.github.gradle.node.npm.task.NpmTask>("readTag") {
+tasks.register<NpmTask>("readTag") {
     description = "Run the read-tag script"
     args.set(listOf("run", "read-tag"))
     dependsOn(tasks.npmInstall)
 }
 
+tasks.register<NpmTask>("writeTag") {
+    description = "Run the read-tag script"
+    args.set(listOf("run", "write-tag"))
+    dependsOn(tasks.npmInstall)
+}
+
 // Task to run in development mode
-tasks.register<com.github.gradle.node.npm.task.NpmTask>("devMode") {
+tasks.register<NpmTask>("devMode") {
     description = "Run in development mode"
     args.set(listOf("run", "dev"))
     dependsOn(tasks.npmInstall)
