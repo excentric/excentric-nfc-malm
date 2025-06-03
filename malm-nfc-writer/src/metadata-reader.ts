@@ -1,0 +1,51 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+
+// Define the AlbumMetadata interface based on the Kotlin class
+export interface AlbumMetadata {
+    title: string;
+    artist?: string;
+    year?: number;
+    appleMusicAlbumId?: string;
+}
+
+// Function to read all metadata files
+export function readAllMetadataFiles(): AlbumMetadata[] {
+    const userHome = os.homedir();
+    const metadataDir = path.join(userHome, '.malm', 'metadata');
+    const metadataFiles: AlbumMetadata[] = [];
+
+    try {
+        // Check if directory exists
+        if (!fs.existsSync(metadataDir)) {
+            console.error(`Metadata directory does not exist: ${metadataDir}`);
+            return [];
+        }
+
+        // Read all JSON files in the directory
+        const files = fs.readdirSync(metadataDir)
+            .filter(file => file.endsWith('.json'));
+
+        console.log(`Found ${files.length} Albums to write:`);
+
+        for (const file of files) {
+            const filePath = path.join(metadataDir, file);
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+            const metadata = JSON.parse(fileContent) as AlbumMetadata;
+
+            // Print filename without extension and title
+            const filenameWithoutExt = path.basename(file, '.json');
+            console.log(`${filenameWithoutExt}: ${metadata.artist} ${metadata.title} (${metadata.year})`);
+
+            metadataFiles.push(metadata);
+        }
+
+        console.log("");
+
+    } catch (error) {
+        console.error('Error reading metadata files:', error);
+    }
+
+    return metadataFiles;
+}
