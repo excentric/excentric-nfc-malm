@@ -31,8 +31,29 @@ class AppleMusicCommands(
             val title = album.title
 
             val appleMusicId = appleMusicApiClient.getAlbumId(artist, title)
-            logger.info("Found $appleMusicId for artist: ${album.artist} and title $title [https://music.apple.com/album/$appleMusicId]")
-            metadataStorage.updateAppleMusicId(slotNumber, appleMusicId)
+            if (appleMusicId != null) {
+                logger.info("Found $appleMusicId for artist: ${album.artist} and title $title [https://music.apple.com/album/$appleMusicId]")
+                metadataStorage.updateAppleMusicId(slotNumber, appleMusicId)
+            } else {
+                logger.warn("Could not find Apple Music album ID for artist: ${album.artist} and title $title")
+            }
         }
+    }
+
+    @ShellMethod(key = ["am-set"], value = "Manually set the apple music album id for a slot")
+    fun setAppleMusicAlbumId(
+        @ShellOption(help = "Slot number") slot: Int,
+        @ShellOption(help = "Apple Music album ID") appleMusicId: String
+    ) {
+        val slotsMap = metadataStorage.getSlotsMap()
+        if (slot !in slotsMap) {
+            logger.error("Slot $slot not found")
+            return
+        }
+
+        val album = slotsMap[slot]
+        logger.info("Setting Apple Music album ID for slot $slot (${album?.artist} - ${album?.title})")
+        metadataStorage.updateAppleMusicId(slot, appleMusicId)
+        logger.info("Successfully set Apple Music album ID for slot $slot to $appleMusicId [https://music.apple.com/album/$appleMusicId]")
     }
 }
