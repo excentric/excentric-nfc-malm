@@ -127,10 +127,13 @@ class MetadataStorage(
         return getSelectedCoverArtFile(slot)
     }
 
+    fun selectCoverArt(slot: Int, index: Int) {
+        selectCoverArt(slot, getPotentialCoverArtFile(slot, index))
+    }
+
     fun selectCoverArt(slot: Int, selectedFile: File) {
         // SC: we will keep the potential cover art for now i think
         selectedFile.copyTo(getSelectedCoverArtFile(slot), overwrite = true)
-        selectedFile.delete()
     }
 
     fun moveSlot(sourceSlot: Int, targetSlot: Int) {
@@ -167,7 +170,7 @@ class MetadataStorage(
 
     fun getPotentialCoverArtFilesDir(slot: Int) = File(metadataDirPath, padded(slot))
 
-    private fun getPotentialCoverArtFile(slot: Int, index: Int): File {
+    fun getPotentialCoverArtFile(slot: Int, index: Int): File {
         val slotDir = getPotentialCoverArtFilesDir(slot).also { it.mkdirs() }
         return File(slotDir, "${padded(index)}.jpg")
     }

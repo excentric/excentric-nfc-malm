@@ -20,7 +20,7 @@ class CoverArtController(
         val albumMetadata = metadataStorage.getSlotsMap()[slot]
 
         model.addAttribute("slot", slot)
-        model.addAttribute("imageCount", coverArtFiles.size)
+        model.addAttribute("imageIndexes", coverArtFiles.map { it.nameWithoutExtension.toInt() })
         model.addAttribute("album", albumMetadata)
 
         return "coverArtThumbnails"
@@ -28,14 +28,10 @@ class CoverArtController(
 
     @GetMapping("/ca/{slot}/image/{index}", produces = [MediaType.IMAGE_JPEG_VALUE])
     fun getCoverArtImage(@PathVariable slot: Int, @PathVariable index: Int): ResponseEntity<ByteArray> {
-        val coverArtFiles = metadataStorage.getPotentialCoverArtsFiles(slot)
-
-        if (index < 0 || index >= coverArtFiles.size) {
-            return ResponseEntity.notFound().build()
-        }
+        val coverArtFile = metadataStorage.getPotentialCoverArtFile(slot, index)
 
         try {
-            val imageBytes = coverArtFiles[index].readBytes()
+            val imageBytes = coverArtFile.readBytes()
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes)
         } catch (e: FileNotFoundException) {
             return ResponseEntity.notFound().build()
@@ -46,9 +42,7 @@ class CoverArtController(
 
     @GetMapping("/ca/{slot}/select/{index}")
     fun selectCoverArt(@PathVariable slot: Int, @PathVariable index: Int, model: Model): String {
-        println("Selected cover art: slot=$slot, index=$index")
-
-        // Redirect back to the thumbnails page
+        metadataStorage.selectCoverArt(slot, index)
         return "redirect:/ca/$slot"
     }
 }
