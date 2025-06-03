@@ -28,23 +28,25 @@ nfc.on('reader', (reader: NFCReader) => {
             // Success !
             if (preparationWrite) {
                 console.log('Data have been written successfully.');
+                process.exit(0); // Exit the process after successful write
             }
 
         } catch (err: unknown) {
             console.error(`error when reading data`, err);
+            process.exit(1); // Exit with error code
         }
     });
 
     reader.on('card.off', (card: NFCCard) => {
-        console.log(`${reader.reader.name}  card removed`, card);
+        console.log(`${reader.reader.name} card removed`, card);
     });
 
     reader.on('error', (err: Error) => {
-        console.log(`${reader.reader.name}  an error occurred`, err);
+        console.log(`${reader.reader.name} an error occurred`, err);
     });
 
     reader.on('end', () => {
-        console.log(`${reader.reader.name}  device removed`);
+        console.log(`${reader.reader.name} device removed`);
     });
 
 });

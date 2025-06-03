@@ -47,7 +47,7 @@ tasks.register<NpmTask>("readTag") {
 }
 
 tasks.register<NpmTask>("writeTag") {
-    description = "Run the read-tag script"
+    description = "Run the write-tag script"
     args.set(listOf("run", "write-tag"))
     dependsOn(tasks.npmInstall)
 }

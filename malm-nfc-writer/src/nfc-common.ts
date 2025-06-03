@@ -25,5 +25,5 @@ export type NDEFMessage = {
 }
 
 // Common NFC module imports
-export const NFC = require('nfc-pcsc');
+export const { NFC } = require('nfc-pcsc');
 export const nfcCard = require('nfccard-tool');

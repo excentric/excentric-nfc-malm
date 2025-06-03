@@ -18,6 +18,7 @@ out/
 */.kotlin
 
 node_modules
+*/dist
 
 ### Eclipse ###
 .apt_generated
