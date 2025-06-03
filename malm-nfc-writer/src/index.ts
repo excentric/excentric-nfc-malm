@@ -9,7 +9,7 @@ export function makeSonosRequest(sonosRequest: string, successCallback?: () => v
     const options = {
         hostname: 'bb',
         port: 5005,
-        path: '/Office/' + sonosRequest,
+        path: '/' + encodeURIComponent('Playroom Sonos') + '/' + sonosRequest,
         method: 'GET'
     };
 
