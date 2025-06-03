@@ -32,7 +32,8 @@ class MalmShellCommands(
 
             slotsMap.forEach { (index, metadata) ->
                 val coverArtStatus = getCoverArtStatus(index)
-                logger.info("Slot $index: Album: ${greenOrRed(metadata.title)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $coverArtStatus")
+                val appleMusicIdStatus = if (metadata.appleMusicAlbumId.isNullOrEmpty()) red("No") else green("Yes")
+                logger.info("Slot $index: Album: ${greenOrRed(metadata.title)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $coverArtStatus, Apple Id: $appleMusicIdStatus")
             }
         }
     }
