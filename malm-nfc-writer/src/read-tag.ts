@@ -1,8 +1,18 @@
 import {makeSonosRequest} from "./sonos-api-client";
 import {getGreenText, getRedText, logReaderAttached, NDEFMessage, NFC, NFCCard, nfcCard, NFCReader} from "./nfc-common";
 import settings from "./settings";
+import notifier from 'node-notifier';
 
 const nfc = new NFC();
+
+function desktopNotify(title: string, message: string) {
+    notifier.notify({
+        title: title,
+        message: message,
+        sound: false,
+        wait: false
+    });
+}
 
 nfc.on('reader', (reader: NFCReader) => {
     logReaderAttached(reader);
@@ -21,9 +31,13 @@ nfc.on('reader', (reader: NFCReader) => {
                 console.log(`Detected Sonos Command: ${getGreenText(sonosCommand)}`,);
 
                 if (sonosCommand.startsWith("applemusic")) {
+                    desktopNotify(`Playing album on ${settings.sonosRoom}`, `${sonosCommand}`);
+
                     console.log(`Clearing queue before playing...`,);
                     await makeSonosRequest("clearqueue", settings.sonosRoom);
                     await new Promise(resolve => setTimeout(resolve, 100));
+                } else if (sonosCommand.startsWith("playpause")) {
+                    desktopNotify(`Play / Pause on ${settings.sonosRoom}`, `${sonosCommand}`);
                 }
 
                 await makeSonosRequest(sonosCommand, settings.sonosRoom);
@@ -33,7 +47,13 @@ nfc.on('reader', (reader: NFCReader) => {
             }
 
         } catch (err: unknown) {
-            console.error(`${getRedText("Error:")} when reading data. Keep trying...`);
+            notifier.notify({
+                title: 'Error - please try again...',
+                message: 'Error - please try again...',
+                sound: false, // Only Notification Center or Windows Toasters
+                wait: false // Don't wait for user interaction
+            });
+            console.error(`${getRedText("Error:")} when reading data. Keep trying...`, err);
         }
     });
 
