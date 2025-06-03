@@ -27,12 +27,13 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-// Function to select a cover art and close the browser tab
+// Function to select a cover art and refresh the page
 function selectAndClose(url) {
     // Make an AJAX call to the selection endpoint
     fetch(url)
         .then(response => {
-
+            // Reload the page to reflect the new state
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error selecting cover art:', error);
