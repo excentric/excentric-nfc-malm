@@ -11,7 +11,7 @@
   },
   "author": "Sean Coughlan",
   "license": "MIT",
-  "description": "Simple TypeScript Hello World project",
+  "description": "Simple NFC Tag Reader/Writer to control Sonos",
   "devDependencies": {
     "@types/node": "^18.0.0",
     "@types/node-notifier": "^8.0.5",
@@ -25,7 +25,6 @@
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",
     "@babel/register": "^7.25.9",
     "nfc-pcsc": "^0.8.1",
-    "nfccard-tool": "^0.1.1",
-    "node-notifier": "^10.0.1"
+    "nfccard-tool": "^0.1.1"
   }
 }
