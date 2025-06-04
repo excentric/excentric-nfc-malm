@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "desktop-notifier": "tsc && node dist/desktop-notifier.js",
     "sonos-nfc-controller": "tsc && node dist/sonos-nfc-controller.js",
     "write-nfc-tags": "tsc && node dist/write-tag.js",
     "build": "tsc",
