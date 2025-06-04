@@ -34,16 +34,16 @@ tasks.register<NpmTask>("buildTypeScript") {
     dependsOn(tasks.npmInstall)
 }
 
-// Task to run the read-tag script
+// Task to run the sonos-nfc-controller script
 tasks.register<NpmTask>("readTag") {
-    description = "Run the read-tag script"
-    args.set(listOf("run", "read-tag"))
+    description = "Run the sonos-nfc-controller script"
+    args.set(listOf("run", "sonos-nfc-controller"))
     dependsOn(tasks.npmInstall)
 }
 
 tasks.register<NpmTask>("writeTag") {
-    description = "Run the write-tag script"
-    args.set(listOf("run", "write-tag"))
+    description = "Run the write-nfc-tags script"
+    args.set(listOf("run", "write-nfc-tags"))
     dependsOn(tasks.npmInstall)
 }
 

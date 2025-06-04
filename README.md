@@ -81,14 +81,14 @@ The CLI application provides the following commands:
 
 #### Reading NFC Tags
 ```
-./scripts/read-tags.sh
+./scripts/sonos-nfc-controllers.sh
 ```
 
 This will start the NFC reader and listen for NFC tags. When a tag is detected, it will read the command from the tag and send it to the configured Sonos speaker.
 
 #### Writing NFC Tags
 ```
-./scripts/write-tags.sh
+./scripts/write-nfc-tags.sh
 ```
 
 This will read album metadata from the `~/.malm/metadata` directory and write Apple Music album IDs to NFC tags when presented to the reader.

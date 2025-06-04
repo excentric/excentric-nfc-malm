@@ -8,7 +8,7 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 cd "$PROJECT_ROOT/malm-nfc"
 
 # Run the write-tag npm script
-npm run write-tag -- "$@"
+npm run write-nfc-tags -- "$@"
 
 # Return to the original directory
 cd - > /dev/null

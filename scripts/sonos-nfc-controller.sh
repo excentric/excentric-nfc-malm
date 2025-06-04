@@ -8,8 +8,8 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 cd "$PROJECT_ROOT/malm-nfc"
 
 export PATH=$PROJECT_ROOT/.gradle/nodejs/node-v21.6.2-linux-x64/bin:$PATH
-# Run the read-tag npm script
-npm run read-tag -- "$@"
+# Run the sonos-nfc-controller npm script
+npm run sonos-nfc-controller -- "$@"
 
 # Return to the original directory
 cd - > /dev/null

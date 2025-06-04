@@ -50,7 +50,7 @@ nfc.on('reader', (reader: NFCReader) => {
             desktopNotify(`Error reading NFC`, `Please try again...`);
 
             console.error(`${getRedText("Error:")} when reading data. Keep trying...`, err);
-        }
+        }1
     });
 
     reader.on('card.off', (card: NFCCard) => {
