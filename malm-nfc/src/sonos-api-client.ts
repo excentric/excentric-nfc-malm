@@ -16,8 +16,6 @@ export function makeSonosRequest(sonosRequest: string, zone: string): Promise<vo
         console.log(`Making request to GET http://${options.hostname}:${options.port}${path}`)
 
         const request = http.request(options, (result) => {
-            console.log(`Status Code: ${getGreenText(result.statusCode?.toString())}\n`);
-
             let data = '';
 
             result.on('data', (chunk) => {
@@ -25,7 +23,7 @@ export function makeSonosRequest(sonosRequest: string, zone: string): Promise<vo
             });
 
             result.on('end', () => {
-                console.log(`Response: ${data}`);
+                console.log(`Response: ${getGreenText(result.statusCode?.toString())} ${data}\n`);
                 resolve();
             });
         });
