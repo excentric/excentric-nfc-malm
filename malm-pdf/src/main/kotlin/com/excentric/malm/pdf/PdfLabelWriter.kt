@@ -113,7 +113,7 @@ class PdfLabelWriter(
 
     private fun calculateOptimalFontSize(text: String, font: PdfFont, maxWidth: Float): Float {
         var fontSize = DEFAULT_FONT_SIZE
-        val minFontSize = 6f // Minimum readable size
+        val minFontSize = 7.5f // Minimum readable size
         val maxFontSize = 17f // Maximum allowed size
 
         // Start with default and adjust down if needed

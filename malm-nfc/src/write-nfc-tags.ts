@@ -31,6 +31,10 @@ switch (mode) {
     case "action":
         actionMode()
         break
+    case "emerg":
+        value = "play/now/favorite/Matthew & Son (Deluxe Edition) [2003 Remaster]"
+        actionMode()
+        break
     default:
         albumMode()
         break

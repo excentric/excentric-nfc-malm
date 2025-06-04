@@ -38,6 +38,16 @@ class MalmShellCommands(
         }
     }
 
+    @ShellMethod(key = ["save-to-slot", "s"], value = "Save current album metadata to a numbered slot (1-99)")
+    fun saveToSlot(
+        @ShellOption(help = "Slot number (1-99)") slot: Int
+    ) {
+        logger.info("Saving album metadata to slot: $slot")
+        doSafely {
+            metadataStorage.saveToSlot(slot)
+        }
+    }
+
     private fun getCoverArtStatus(index: Int): String {
         return if (metadataStorage.getCoverArtFile(index).exists()) {
             green("Yes")

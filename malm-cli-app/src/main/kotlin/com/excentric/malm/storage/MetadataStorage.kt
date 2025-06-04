@@ -36,7 +36,7 @@ class MetadataStorage(
         return slot
     }
 
-    private fun saveToSlot(slot: Int, albumMetadata: AlbumMetadata? = this.albumMetadata) {
+    fun saveToSlot(slot: Int, albumMetadata: AlbumMetadata? = this.albumMetadata) {
         validate(slot, albumMetadata)
 
         try {
