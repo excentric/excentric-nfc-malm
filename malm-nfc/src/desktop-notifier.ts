@@ -5,7 +5,8 @@ function desktopNotify(title: string, message: string) {
         title: title,
         message: message,
         sound: false,
-        wait: false
+        wait: false,
+        timeout: 1,
     });
 }
 
