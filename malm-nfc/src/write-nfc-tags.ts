@@ -126,18 +126,6 @@ function startNfcWriter(onWaitingForWrite: () => void, nfcText: () => string, on
             }
         });
 
-        reader.on('card.off', (card: NFCCard) => {
-            // console.log(`${reader.reader.name} card removed`, card);
-        });
-
-        reader.on('error', (err: Error) => {
-            // console.log(`${reader.reader.name} an error occurred`, err);
-        });
-
-        reader.on('end', () => {
-            // console.log(`${reader.reader.name} device removed`);
-        });
-
     });
 
     nfc.on('error', (err: Error) => {

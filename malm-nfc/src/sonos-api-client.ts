@@ -2,7 +2,7 @@ import * as http from 'http';
 import {getGreenText} from "./nfc-common";
 import settings from "./settings";
 
-export function makeSonosRequest(sonosRequest: string, zone: string, successCallback?: () => void): Promise<void> {
+export function makeSonosRequest(sonosRequest: string, zone: string): Promise<void> {
     return new Promise((resolve, reject) => {
         let path = '/' + encodeURIComponent(zone) + '/' + sonosRequest;
 
@@ -25,12 +25,7 @@ export function makeSonosRequest(sonosRequest: string, zone: string, successCall
             });
 
             result.on('end', () => {
-                // console.log('Response:');
-                // console.log(data);
-
-                if (successCallback) {
-                    successCallback();
-                }
+                console.log(`Response: ${data}`);
                 resolve();
             });
         });
