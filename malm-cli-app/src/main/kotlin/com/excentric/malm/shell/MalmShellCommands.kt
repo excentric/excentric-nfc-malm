@@ -1,5 +1,6 @@
 package com.excentric.malm.shell
 
+import com.excentric.malm.metadata.AlbumMetadata
 import com.excentric.malm.storage.MetadataStorage
 import com.excentric.malm.util.ConsoleColors.green
 import com.excentric.malm.util.ConsoleColors.greenOrRed
@@ -35,6 +36,20 @@ class MalmShellCommands(
                 val appleMusicIdStatus = if (metadata.appleMusicAlbumId.isNullOrEmpty()) red("No") else green("Yes")
                 logger.info("Slot $index: Album: ${greenOrRed(metadata.title)}, Artist: ${greenOrRed(metadata.artist)}, Year: ${greenOrRed(metadata.year)}, Cover: $coverArtStatus, Apple Id: $appleMusicIdStatus")
             }
+        }
+    }
+
+    @ShellMethod(key = ["create-slot", "c"], value = "Create new slot with custom metadata")
+    fun createSlot(
+        @ShellOption(help = "Slot number (1-99)") slot: Int,
+        @ShellOption(help = "Artist") artist: String,
+        @ShellOption(help = "Album") album: String,
+        @ShellOption(help = "Year") year: Int?,
+    ) {
+        logger.info("Creating artist/album metadata to slot: $slot")
+        doSafely {
+            metadataStorage.albumMetadata = AlbumMetadata(emptyList(), album, artist, year)
+            metadataStorage.saveToSlot(slot)
         }
     }
 
